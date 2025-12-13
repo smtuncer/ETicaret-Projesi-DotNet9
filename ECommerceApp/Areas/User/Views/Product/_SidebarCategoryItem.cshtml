@@ -1,0 +1,39 @@
+@model ECommerceApp.Models.Category
+@{
+    int? selectedId = ViewData["SelectedCategoryId"] as int?;
+    var subCategories = Model.SubCategories?.Where(c => c.IsActive).OrderBy(c => c.Order).ThenBy(c => c.Name).ToList();
+    bool hasChildren = subCategories != null && subCategories.Any();
+
+    // Helper local function to check if this branch contains the selected category
+    bool IsBranchActive(ECommerceApp.Models.Category cat, int? sId)
+    {
+        if (!sId.HasValue) return false;
+        if (cat.Id == sId) return true;
+        if (cat.SubCategories == null || !cat.SubCategories.Any()) return false;
+        return cat.SubCategories.Any(c => IsBranchActive(c, sId));
+    }
+
+    bool isExpanded = IsBranchActive(Model, selectedId);
+}
+
+<li class="@(hasChildren ? "menu-item-has-children" : "") @(Model.Id == selectedId ? "current-menu-item" : "")" 
+    style="display: flex; flex-wrap: wrap; align-items: center; position: relative;">
+    
+    <a asp-action="Index" asp-route-categoryId="@Model.Id" 
+       style="flex: 1; margin-right: 5px; display: block; overflow-wrap: break-word; word-break: break-word;">
+        @Model.Name
+    </a>
+
+    @if (hasChildren)
+    {
+        <span class="sub-toggle" style="flex: 0 0 auto; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; top: auto; right: auto;">
+            <i class="fa-solid fa-angle-down"></i>
+        </span>
+        <ul class="sub-menu" style="flex: 0 0 100%; width: 100%; @(isExpanded ? "display:block" : "display:none")">
+            @foreach (var sub in subCategories)
+            {
+                <partial name="_SidebarCategoryItem" model="sub" view-data="ViewData" />
+            }
+        </ul>
+    }
+</li>

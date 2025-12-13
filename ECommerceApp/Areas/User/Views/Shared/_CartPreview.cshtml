@@ -1,0 +1,41 @@
+@using ECommerceApp.Helper
+@model ECommerceApp.Models.Cart
+
+<div class="ps-cart__content">
+    @if (Model.Items != null && Model.Items.Any())
+    {
+        <div class="ps-cart__items">
+            @foreach (var item in Model.Items)
+            {
+                <div class="ps-product--cart-mobile">
+                    <div class="ps-product__thumbnail">
+                        <a href="@Url.ProductUrl(item.ProductId, item.Product.Name, item.Product.Slug)">
+                            <img src="@(item.Product.Images.FirstOrDefault()?.ImageUrl ?? "/img/placeholder.png")" alt="@item.Product.Name">
+                        </a>
+                    </div>
+                    <div class="ps-product__content">
+                        <a class="ps-product__remove" href="javascript:void(0);" onclick="removeFromCartHeader(@item.Id)">
+                            <i class="icon-cross"></i>
+                        </a>
+                        <a href="@Url.ProductUrl(item.ProductId, item.Product.Name, item.Product.Slug)">@item.Product.Name</a>
+                        <p><strong>Satıcı:</strong> @(item.Product.Brand?.Name ?? "Mağaza")</p>
+                        <small>@item.Quantity x @item.Product.Price.ToString("N2") ₺</small>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="ps-cart__footer">
+            <h3>Toplam:<strong>@Model.TotalAmount.ToString("N2") ₺</strong></h3>
+            <figure>
+                <a class="ps-btn" href="/sepet">Sepete Git</a>
+                <a class="ps-btn" href="/odeme">Ödeme Yap</a>
+            </figure>
+        </div>
+    }
+    else
+    {
+        <div class="ps-cart__items">
+            <p class="text-center py-3">Sepetiniz boş.</p>
+        </div>
+    }
+</div>

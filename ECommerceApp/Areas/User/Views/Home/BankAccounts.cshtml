@@ -1,0 +1,197 @@
+@model IEnumerable<ECommerceApp.Models.BankAccount>
+
+@{
+    ViewData["Title"] = "Banka Hesapları";
+}
+
+<div class="ps-page--single">
+    <div class="ps-section--custom pt-5 pb-5">
+        <div class="container">
+            <div class="ps-section__header text-center mb-5">
+                <h1 class="ps-section__title fw-bold">Banka Hesaplarımız</h1>
+                <p class="lead text-muted">Ödemelerinizi güvenle yapabileceğiniz anlaşmalı banka hesaplarımız.</p>
+                <div class="alert alert-info d-inline-block mt-3 shadow-sm border-0 bg-light-info text-info rounded-pill px-4">
+                    <i class="icon-info-circle me-2"></i>
+                    Havale/EFT işlemlerinde sipariş numaranızı açıklama kısmına yazmayı unutmayınız.
+                </div>
+            </div>
+
+            <div class="ps-section__content">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="row justify-content-center">
+                        @foreach (var account in Model)
+                        {
+                            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 mb-4">
+                                <div class="bank-card position-relative overflow-hidden rounded-4 shadow-sm h-100">
+                                    <div class="bank-card-bg"></div>
+                                    <div class="bank-card-body p-4 position-relative text-white">
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <div class="bank-icon bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px;">
+                                                <i class="icon-wallet fs-4" style="color: #222;"></i>
+                                            </div>
+                                            <h4 class="mb-0 text-white opacity-75">@account.BankName</h4>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label class="small text-white opacity-75 d-block mb-1">ALICI ADI</label>
+                                            <h5 class="text-white mb-0 fw-bold letter-spacing-1">@account.AccountHolder</h5>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="small text-white opacity-75 d-block mb-1">IBAN</label>
+                                            <div class="d-flex align-items-center bg-white bg-opacity-10 rounded px-3 py-2">
+                                                <span class="fs-5 fw-bold font-monospace me-auto text-white" id="iban-@account.Id">@account.IBAN</span>
+                                                <button class="btn btn-sm btn-light py-1 px-2 ms-2 copy-btn" data-clipboard-target="#iban-@account.Id" title="IBAN'ı Kopyala">
+                                                    <i class="icon-copy"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 text-white opacity-75 small">
+                                            @if (!string.IsNullOrEmpty(account.AccountNumber))
+                                            {
+                                                <div class="col-6">
+                                                    <span>Hesap No:</span> <strong>@account.AccountNumber</strong>
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(account.BranchCode))
+                                            {
+                                                <div class="col-6 text-end">
+                                                    <span>Şube Kodu:</span> <strong>@account.BranchCode</strong>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="row mt-5">
+                       <div class="col-12">
+                           <div class="process-steps card border-0 shadow-sm rounded-4 p-5 bg-light">
+                               <h3 class="text-center mb-5 fw-bold">Nasıl Ödeme Yaparım?</h3>
+                               <div class="row text-center g-4">
+                                   <div class="col-md-4">
+                                       <div class="step-item p-3">
+                                           <div class="step-icon bg-white text-primary rounded-circle mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 1.5rem;">
+                                               <i class="icon-cart"></i>
+                                           </div>
+                                           <h5 class="fw-bold">1. Siparişi Ver</h5>
+                                           <p class="text-muted small">Ödeme yöntemi olarak "Havale/EFT" seçeneğini işaretleyerek siparişinizi tamamlayın.</p>
+                                       </div>
+                                   </div>
+                                    <div class="col-md-4">
+                                       <div class="step-item p-3 position-relative">
+                                           <div class="step-icon bg-white text-primary rounded-circle mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 1.5rem;">
+                                               <i class="icon-credit-card"></i>
+                                           </div>
+                                           <h5 class="fw-bold">2. Ödemeyi Gönder</h5>
+                                            <p class="text-muted small">Yukarıdaki banka hesaplarımızdan birine, açıklama kısmına <strong>Sipariş No</strong> yazarak tutarı gönderin.</p>
+                                       </div>
+                                   </div>
+                                    <div class="col-md-4">
+                                       <div class="step-item p-3">
+                                           <div class="step-icon bg-white text-primary rounded-circle mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 1.5rem;">
+                                               <i class="icon-envelope"></i>
+                                           </div>
+                                           <h5 class="fw-bold">3. Bildirim Yap</h5>
+                                            <p class="text-muted small">Hesabım > Ödeme Bildirimlerim sayfasından ödeme yaptığınıza dair bildirim oluşturun.</p>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning text-center p-5 rounded-4 shadow-sm border-0">
+                        <div class="mb-3 text-warning">
+                            <i class="icon-warning fs-1"></i>
+                        </div>
+                        <h4 class="alert-heading text-dark fw-bold">Henüz Banka Hesabı Eklenmemiş</h4>
+                        <p class="mb-0 text-muted">Şu anda aktif banka hesabımız bulunmamaktadır. Lütfen daha sonra tekrar kontrol ediniz.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bank-card {
+        background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+    }
+    .bank-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    .bank-card-bg {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+        transform: rotate(45deg);
+        pointer-events: none;
+    }
+    .text-primary {
+        color: #C5A059 !important; /* Gold/Theme color */
+    }
+    .bg-light-info {
+        background-color: rgba(63, 133, 237, 0.1);
+    }
+    .letter-spacing-1 {
+        letter-spacing: 1px;
+    }
+    .step-icon {
+        color: #C5A059 !important;
+        font-weight: bold;
+    }
+    .copy-btn {
+        transition: all 0.2s ease;
+    }
+    .copy-btn:hover {
+        background-color: #C5A059;
+        color: white;
+        border-color: #C5A059;
+    }
+    .process-steps {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-clipboard-target');
+                const textElement = document.querySelector(targetId);
+                
+                if(textElement) {
+                    const textToCopy = textElement.innerText;
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        const originalIcon = this.innerHTML;
+                        this.innerHTML = '<i class="icon-thumbs-up"></i>';
+                        this.classList.add('btn-success');
+                        this.classList.remove('btn-light');
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalIcon;
+                            this.classList.remove('btn-success');
+                            this.classList.add('btn-light');
+                        }, 2000);
+                    });
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,67 @@
+@model ECommerceApp.Models.Order
+@{
+    ViewData["Title"] = "Kredi Kartı ile Ödeme";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="ps-page--simple">
+    <div class="ps-breadcrumb">
+        <div class="container">
+            <ul class="breadcrumb">
+                <li><a href="/">Ana Sayfa</a></li>
+                <li><a href="/sepet">Sepet</a></li>
+                <li>Ödeme</li>
+            </ul>
+        </div>
+    </div>
+    <div class="ps-checkout ps-section--shopping">
+        <div class="container">
+            <div class="ps-section__header">
+                <h1>Kredi Kartı ile Ödeme</h1>
+            </div>
+            <div class="ps-section__content">
+                <div class="row">
+                    <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 ">
+                        <div class="ps-block--shipping">
+                            <div class="ps-block__panel">
+                                <figure>
+                                    <small>Ödeme işlemini tamamlamak için lütfen aşağıdaki formu doldurunuz.</small>
+                                </figure>
+                            </div>
+                            
+                            <!-- PayTR IFrame -->
+                            <div style="width: 100%;">
+                                <script src="https://www.paytr.com/js/iframeResizer.min.js"></script>
+                                <iframe src="https://www.paytr.com/odeme/guvenli/@ViewBag.Token" id="paytriframe" frameborder="0" scrolling="no" style="width: 100%;"></iframe>
+                                <script>iFrameResize({},'#paytriframe');</script>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 ">
+                        <div class="ps-form__orders">
+                            <h3>Sipariş Özeti</h3>
+                            <div class="ps-block--checkout-order">
+                                <div class="ps-block__content">
+                                    <figure>
+                                        <figcaption><strong>Ürün</strong><strong>Toplam</strong></figcaption>
+                                    </figure>
+                                    <figure>
+                                        @foreach (var item in Model.Items)
+                                        {
+                                            <a href="#"><strong>@item.ProductName</strong> x @item.Quantity</a>
+                                            <p>@((item.Price * item.Quantity).ToString("C2"))</p>
+                                        }
+                                    </figure>
+                                    <figure class="ps-block__total">
+                                        <h3>Toplam Ödeme<strong>@Model.TotalAmount.ToString("C2")</strong></h3>
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,421 @@
+@model IEnumerable<ECommerceApp.Models.Order>
+
+@{
+    ViewData["Title"] = "Siparişler";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Siparişler</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Sipariş Yönetimi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                <!-- Filter Form -->
+                <div class="card mb-5">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">Filtreleme Seçenekleri</span>
+                        </h3>
+                    </div>
+                    <div class="card-body py-3">
+                        <form asp-action="Index" method="get" class="form">
+                            <div class="row mb-4">
+                                <!-- Search -->
+                                <div class="col-md-3">
+                                    <label class="form-label fs-6 fw-semibold">Arama</label>
+                                    <input type="text" name="search" class="form-control" placeholder="Sipariş No, Müşteri Adı/Email" value="@ViewBag.CurrentSearch" />
+                                </div>
+                                <!-- Status -->
+                                <div class="col-md-3">
+                                    <label class="form-label fs-6 fw-semibold">Durum</label>
+                                    <select name="status" class="form-select" data-control="select2" data-placeholder="Durum Seçiniz">
+                                        <option value="">Tümü</option>
+                                        @foreach (var status in Enum.GetValues(typeof(ECommerceApp.Models.OrderStatus)))
+                                        {
+                                            <!option value="@status" @(ViewBag.CurrentStatus == status.ToString() ? "selected" : "")>
+                                                @status
+                                            </!option>
+                                        }
+                                    </select>
+                                </div>
+                                <!-- Date Range -->
+                                <div class="col-md-3">
+                                    <label class="form-label fs-6 fw-semibold">Başlangıç Tarihi</label>
+                                    <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fs-6 fw-semibold">Bitiş Tarihi</label>
+                                    <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+                                </div>
+                            </div>
+                            <div class="row align-items-end">
+                                <!-- Page Size -->
+                                <div class="col-md-2">
+                                    <label class="form-label fs-6 fw-semibold">Sayfa Başına</label>
+                                    <select name="pageSize" class="form-select">
+                                        <!option value="10" @(ViewBag.PageSize == 10 ? "selected" : "")>10</!option>
+                                        <!option value="20" @(ViewBag.PageSize == 20 ? "selected" : "")>20</!option>
+                                        <!option value="50" @(ViewBag.PageSize == 50 ? "selected" : "")>50</!option>
+                                        <!option value="100" @(ViewBag.PageSize == 100 ? "selected" : "")>100</!option>
+                                    </select>
+                                </div>
+                                <!-- Buttons -->
+                                <div class="col-md-10 text-end">
+                                    <a asp-action="Index" class="btn btn-light me-2">TEMİZLE</a>
+                                    <button type="submit" class="btn btn-primary">FİLTRELE</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden input for maintaining sort order when filtering -->
+                            <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card card-flush">
+                    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                        <div class="card-title">
+                            <h3>Sipariş Listesi (@ViewBag.TotalItems Adet)</h3>
+                        </div>
+                        <div class="card-toolbar">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
+                                <i class="bi bi-file-earmark-excel me-2"></i>Excel Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_products_table">
+                            <thead>
+                                <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                    <th>
+                                        <a asp-action="Index" 
+                                           asp-route-sortOrder="order_number" 
+                                           asp-route-search="@ViewBag.CurrentSearch" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-pageSize="@ViewBag.PageSize"
+                                           class="@(ViewBag.CurrentSort == "order_number" ? "text-primary" : "text-gray-400")">
+                                            Sipariş No
+                                        </a>
+                                    </th>
+                                    <th>Müşteri</th>
+                                    <th>
+                                        <a asp-action="Index" 
+                                           asp-route-sortOrder="status" 
+                                           asp-route-search="@ViewBag.CurrentSearch" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-pageSize="@ViewBag.PageSize"
+                                           class="@(ViewBag.CurrentSort == "status" ? "text-primary" : "text-gray-400")">
+                                            Durum
+                                        </a>
+                                    </th>
+                                    <th>Ödeme</th>
+                                    <th>
+                                        <a asp-action="Index" 
+                                           asp-route-sortOrder="@(ViewBag.CurrentSort == "amount_desc" ? "amount_asc" : "amount_desc")" 
+                                           asp-route-search="@ViewBag.CurrentSearch" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-pageSize="@ViewBag.PageSize"
+                                           class="@(ViewBag.CurrentSort.ToString().Contains("amount") ? "text-primary" : "text-gray-400")">
+                                            Tutar @(ViewBag.CurrentSort == "amount_desc" ? "▼" : (ViewBag.CurrentSort == "amount_asc" ? "▲" : ""))
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a asp-action="Index" 
+                                           asp-route-sortOrder="@(ViewBag.CurrentSort == "date_desc" ? "date_asc" : "date_desc")" 
+                                           asp-route-search="@ViewBag.CurrentSearch" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-pageSize="@ViewBag.PageSize"
+                                           class="@(ViewBag.CurrentSort.ToString().Contains("date") ? "text-primary" : "text-gray-400")">
+                                            Tarih @(ViewBag.CurrentSort == "date_desc" ? "▼" : (ViewBag.CurrentSort == "date_asc" ? "▲" : ""))
+                                        </a>
+                                    </th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a asp-action="Detail" asp-route-id="@item.Id" class="text-gray-800 text-hover-primary fw-bold">@item.OrderNumber</a>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="text-gray-800 fw-bold">@item.User?.Name @item.User?.Surname</span>
+                                                <span class="text-muted fs-7">@item.User?.Email</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if (item.Status == ECommerceApp.Models.OrderStatus.Pending)
+                                            {
+                                                <span class="badge badge-light-warning">Beklemede</span>
+                                            }
+                                            else if (item.Status == ECommerceApp.Models.OrderStatus.Approved)
+                                            {
+                                                <span class="badge badge-light-success">Onaylandı</span>
+                                            }
+                                            else if (item.Status == ECommerceApp.Models.OrderStatus.Shipped)
+                                            {
+                                                <span class="badge badge-light-info">Kargolandı</span>
+                                            }
+                                            else if (item.Status == ECommerceApp.Models.OrderStatus.Delivered)
+                                            {
+                                                <span class="badge badge-light-success">Teslim Edildi</span>
+                                            }
+                                            else if (item.Status == ECommerceApp.Models.OrderStatus.Cancelled)
+                                            {
+                                                <span class="badge badge-light-danger">İptal Edildi</span>
+                                            }
+                                            else if (item.Status == ECommerceApp.Models.OrderStatus.Refunded)
+                                            {
+                                                <span class="badge badge-light-secondary">İade Edildi</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.PaymentMethod == ECommerceApp.Models.PaymentMethod.CreditCard)
+                                            {
+                                                <span class="badge badge-light-primary">Kredi Kartı</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-light-info">Havale/EFT</span>
+                                            }
+                                        </td>
+                                        <td>@item.TotalAmount.ToString("N2") ₺</td>
+                                        <td>@item.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            <a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-sm btn-light btn-active-light-primary">Detay</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    @{
+                        int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+                        int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+                        int windowSize = 5;
+                        int startPage = Math.Max(1, currentPage - 2);
+                        int endPage = Math.Min(totalPages, startPage + windowSize - 1);
+                        if (endPage - startPage < windowSize - 1)
+                        {
+                            startPage = Math.Max(1, endPage - windowSize + 1);
+                        }
+                    }
+
+                    @if (totalPages > 1)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mt-5 px-4 pb-4">
+                            <div class="text-muted">
+                                Sayfa @currentPage / @totalPages
+                            </div>
+                            <ul class="pagination">
+                                @if (currentPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-page="@(currentPage - 1)" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-search="@ViewBag.CurrentSearch"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-sortOrder="@ViewBag.CurrentSort"
+                                           asp-route-pageSize="@ViewBag.PageSize">Önceki</a>
+                                    </li>
+                                }
+
+                                @if (startPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-page="1" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-search="@ViewBag.CurrentSearch"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-sortOrder="@ViewBag.CurrentSort"
+                                           asp-route-pageSize="@ViewBag.PageSize">1</a>
+                                    </li>
+                                    @if (startPage > 2)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                }
+
+                                @for (int i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-page="@i" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-search="@ViewBag.CurrentSearch"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-sortOrder="@ViewBag.CurrentSort"
+                                           asp-route-pageSize="@ViewBag.PageSize">@i</a>
+                                    </li>
+                                }
+
+                                @if (endPage < totalPages)
+                                {
+                                    if (endPage < totalPages - 1)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-page="@totalPages" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-search="@ViewBag.CurrentSearch"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-sortOrder="@ViewBag.CurrentSort"
+                                           asp-route-pageSize="@ViewBag.PageSize">@totalPages</a>
+                                    </li>
+                                }
+
+                                @if (currentPage < totalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" 
+                                           asp-route-page="@(currentPage + 1)" 
+                                           asp-route-status="@ViewBag.CurrentStatus"
+                                           asp-route-search="@ViewBag.CurrentSearch"
+                                           asp-route-startDate="@ViewBag.StartDate"
+                                           asp-route-endDate="@ViewBag.EndDate"
+                                           asp-route-sortOrder="@ViewBag.CurrentSort"
+                                           asp-route-pageSize="@ViewBag.PageSize">Sonraki</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excel Dışa Aktar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="ExportExcel" method="post" id="exportForm">
+                <div class="modal-body">
+                    <p class="text-muted mb-4">Dışa aktarmak istediğiniz sütunları seçiniz.</p>
+                    
+                    <!-- Hidden Filter Inputs -->
+                    <input type="hidden" name="search" id="export_search" />
+                    <input type="hidden" name="status" id="export_status" />
+                    <input type="hidden" name="startDate" id="export_startDate" />
+                    <input type="hidden" name="endDate" id="export_endDate" />
+                    <input type="hidden" name="sortOrder" id="export_sortOrder" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="OrderNumber" checked id="col_OrderNumber" />
+                                <label class="form-check-label" for="col_OrderNumber">Sipariş No</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="CustomerName" checked id="col_CustomerName" />
+                                <label class="form-check-label" for="col_CustomerName">Müşteri Adı</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="CustomerEmail" checked id="col_CustomerEmail" />
+                                <label class="form-check-label" for="col_CustomerEmail">Müşteri Email</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="Status" checked id="col_Status" />
+                                <label class="form-check-label" for="col_Status">Durum</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="PaymentMethod" checked id="col_PaymentMethod" />
+                                <label class="form-check-label" for="col_PaymentMethod">Ödeme Yöntemi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="TotalAmount" checked id="col_TotalAmount" />
+                                <label class="form-check-label" for="col_TotalAmount">Tutar</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="OrderDate" checked id="col_OrderDate" />
+                                <label class="form-check-label" for="col_OrderDate">Sipariş Tarihi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" name="selectedColumns" value="ShippingNote" id="col_ShippingNote" />
+                                <label class="form-check-label" for="col_ShippingNote">Kargo Notu</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-download me-2"></i>Dışa Aktar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var exportModal = document.getElementById('exportModal');
+        exportModal.addEventListener('show.bs.modal', function (event) {
+            // Main filters (grab from URL parameters or form inputs matches)
+            // Since we reload page on filter, URL params are the truth, but input values are also set from ViewBag.
+            // Let's grab from the main inputs which are populated from ViewBag
+            
+            document.getElementById('export_search').value = document.querySelector('input[name="search"]').value;
+            document.getElementById('export_status').value = document.querySelector('select[name="status"]').value;
+            document.getElementById('export_startDate').value = document.querySelector('input[name="startDate"]').value;
+            document.getElementById('export_endDate').value = document.querySelector('input[name="endDate"]').value;
+            document.getElementById('export_sortOrder').value = document.querySelector('input[name="sortOrder"]').value;
+        });
+    });
+</script>

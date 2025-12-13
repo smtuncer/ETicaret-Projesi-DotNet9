@@ -1,0 +1,25 @@
+﻿@model int
+
+@{
+    ViewData["Title"] = Model == 404 ? "Sayfa Bulunamadı" : "Bir Hata Oluştu";
+    string imagePath = Model == 404 ? "/martfury/img/404.jpg" : "/martfury/img/404.jpg"; // 500 için farklı resim yoksa aynı kalsın
+    string title = Model == 404 ? "Üzgünüz! Sayfa Bulunamadı" : "Beklenmedik Bir Hata Oluştu";
+    string message = Model == 404 
+        ? "Aradığınız içeriğe ulaşılamıyor. Bağlantı kırık olabilir veya sayfa kaldırılmış olabilir." 
+        : "Sunucuda teknik bir sorun meydana geldi. Lütfen daha sonra tekrar deneyiniz.";
+}
+
+<div class="ps-page--404">
+    <div class="container">
+        <div class="ps-section__content">
+            <figure>
+                <img src="@imagePath" alt="@title">
+                <h3>@title</h3>
+            <p>
+                    @message <br>
+                <a href="/">Ana Sayfa</a>'ya dönebilirsiniz.
+            </p>
+            </figure>
+        </div>
+    </div>
+</div>

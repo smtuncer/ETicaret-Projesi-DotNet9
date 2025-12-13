@@ -1,0 +1,115 @@
+@{
+    ViewData["Title"] = "SMS Gönderimi";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">SMS Yönetimi</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">SMS Gönderimi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h3 class="card-title">Toplu SMS Gönderimi</h3>
+                        <div class="card-toolbar">
+                             <span class="badge badge-light-success fw-bold me-auto px-4 py-3">NetGSM</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Send" method="post" id="smsForm">
+                            
+                            <div class="mb-10">
+                                <label for="message" class="required form-label">Mesaj İçeriği</label>
+                                <textarea class="form-control form-control-solid" name="message" id="message" rows="5" required placeholder="Gönderilecek SMS metnini buraya giriniz..." onkeyup="countChar(this)"></textarea>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <small class="text-muted">Türkçe karakterlere dikkat ediniz.</small>
+                                    <div class="fw-bold text-gray-600" id="charNum">0 karakter</div>
+                                </div>
+                            </div>
+
+                            <div class="separator separator-dashed my-8"></div>
+
+                            <div class="mb-10">
+                                <div class="form-check form-switch form-check-custom form-check-solid">
+                                    <input class="form-check-input" type="checkbox" value="true" id="sendToAllUsers" name="sendToAllUsers" checked onchange="toggleSpecificNumbers()">
+                                    <label class="form-check-label fs-6 fw-semibold text-gray-800" for="sendToAllUsers">
+                                        Tüm Kayıtlı Müşterilere Gönder
+                                    </label>
+                                </div>
+                                <div class="form-text text-muted mt-2">Bu seçenek işaretli olduğunda, sistemdeki telefon numarası kayıtlı tüm kullanıcılara gönderim yapılır.</div>
+                            </div>
+
+                            <div class="mb-10" id="specificNumbersArea" style="display:none;">
+                                <label for="specificNumbers" class="form-label">Özel Numaralar (Opsiyonel)</label>
+                                <textarea class="form-control form-control-solid" name="specificNumbers" id="specificNumbers" rows="3" placeholder="5551234567, 5321234567... (Virgül veya yeni satır ile ayırınız)"></textarea>
+                                <div class="form-text">Sadece belirli kişilere göndermek isterseniz "Tüm Müşterilere Gönder" seçeneğini kapatıp buraya numara girebilirsiniz. Seçenek açıkken buraya girilen numaralar da listeye eklenir.</div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <span class="indicator-label">
+                                        <i class="ki-duotone ki-send fs-2 me-2">
+                                            <span class="path1"></span><span class="path2"></span>
+                                        </i>Gönderimi Başlat
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function countChar(val) {
+        var len = val.value.length;
+        var credits = Math.ceil(len / 155); // Yaklaşık SMS boyutu hesabı
+        if (len == 0) credits = 0;
+        
+        $('#charNum').text(len + " karakter (~" + credits + " SMS)");
+    }
+
+    function toggleSpecificNumbers() {
+        var isChecked = document.getElementById('sendToAllUsers').checked;
+        var area = document.getElementById('specificNumbersArea');
+        
+        // Mantık: Her zaman gösterilebilir ama opsiyoneldir. 
+        // Kullanıcı deneyimi açısından, 'Tümüne gönder' kapalıysa burası zorunlu gibi hissettirmeli, açıksa ek olarak.
+        // Basitlik için her zaman görünür yapabiliriz ya da vurgulayıcı değiştirebiliriz.
+        // Kullanıcı isteğine göre: "Açarsa tümüne gider, kapatırsa buraya yazar"
+        
+        if(isChecked) {
+             // Tümüne gönderiyoruz, burası opsiyonel ekleme alanı olur.
+             $('#specificNumbers').attr('placeholder', 'Listeye eklemek istediğiniz ekstra numaralar...');
+             $(area).fadeIn();
+        } else {
+             // Sadece buraya gönderiyoruz.
+             $('#specificNumbers').attr('placeholder', '5551234567, 5321234567...');
+             $(area).fadeIn();
+        }
+    }
+
+    // Sayfa yüklendiğinde çalıştır
+    document.addEventListener("DOMContentLoaded", function() {
+       toggleSpecificNumbers();
+    });
+</script>

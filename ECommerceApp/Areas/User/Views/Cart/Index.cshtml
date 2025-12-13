@@ -1,0 +1,138 @@
+@model ECommerceApp.Models.Cart
+@using ECommerceApp.Helper
+
+@{
+    ViewData["Title"] = "Sepetim";
+}
+
+<div class="ps-page--simple">
+    <div class="ps-section--shopping ps-shopping-cart">
+        <div class="container">
+            <div class="ps-section__header">
+                <h1>Sepetim</h1>
+            </div>
+            <div class="ps-section__content">
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table ps-table--shopping-cart ps-table--responsive">
+                            <thead>
+                                <tr>
+                                    <th>Ürün Adı</th>
+                                    <th>Fiyat</th>
+                                    <th>Adet</th>
+                                    <th>Toplam</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td data-label="Ürün">
+                                            <div class="ps-product--cart">
+                                                <div class="ps-product__thumbnail">
+                                                    <a href="@Url.ProductUrl(item.ProductId, item.Product.Name, item.Product.Slug)">
+                                                        <img loading="lazy" src="@(item.Product.Images.FirstOrDefault()?.ImageUrl ?? "/img/placeholder.png")" alt="@item.Product.Name" />
+                                                    </a>
+                                                </div>
+                                                <div class="ps-product__content">
+                                                    <a href="@Url.ProductUrl(item.ProductId, item.Product.Name, item.Product.Slug)">@item.Product.Name</a>
+                                                    <p>Satıcı:<strong> @(item.Product.Brand?.Name ?? "Mağaza")</strong></p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="price" data-label="Fiyat">
+                                            @item.Product.Price.ToString("N2") ₺
+                                            <br />
+                                            <small class="text-muted" style="font-size: 11px;">+ %@item.VatRate.ToString("0") KDV (@((item.VatAmount / item.Quantity).ToString("N2")) ₺)</small>
+                                        </td>
+                                        <td data-label="Adet">
+                                            <div class="form-group--number">
+                                                <button type="button" class="up js-qty-update" data-id="@item.Id" data-action="increase">+</button>
+                                                <button type="button" class="down js-qty-update" data-id="@item.Id" data-action="decrease">-</button>
+                                                <input class="form-control" type="text" id="qty-@item.Id" value="@item.Quantity" readonly>
+                                            </div>
+                                        </td>
+                                        <td data-label="Toplam">
+                                            @((item.Quantity * item.PriceWithVat).ToString("N2")) ₺
+                                            <br />
+                                            <small class="text-muted" style="font-size: 11px;">(@item.VatAmount.ToString("N2") ₺ KDV)</small>
+                                        </td>
+                                        <td data-label="İşlemler">
+                                            <a href="javascript:void(0);" onclick="removeFromCart(@item.Id)">
+                                                <i class="icon-cross"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ps-section__cart-actions">
+                        <a class="ps-btn" asp-controller="Product" asp-action="Index"><i class="icon-arrow-left"></i> Alışverişe Devam Et</a>
+                        <a class="ps-btn ps-btn--outline" href="/sepet"><i class="icon-sync"></i> Sepeti Güncelle</a>
+                    </div>
+                    <div class="ps-section__footer">
+                        <div class="row">
+                            <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 ">
+                                <figure>
+                                    <figcaption>Kupon İndirimi</figcaption>
+                                    <div class="form-group">
+                                        @if (Model.Coupon != null)
+                                        {
+                                            <div class="alert alert-success">
+                                                <strong>@Model.Coupon.Code</strong> kuponu uygulandı.
+                                                <br />
+                                                <a href="javascript:void(0);" onclick="removeCoupon()" class="text-danger">Kaldır</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" type="text" id="couponCode" placeholder="Kupon Kodu">
+                                        }
+                                    </div>
+                                    @if (Model.Coupon == null)
+                                    {
+                                        <div class="form-group">
+                                            <button type="button" class="ps-btn ps-btn--outline" onclick="applyCoupon()">Uygula</button>
+                                        </div>
+                                    }
+                                </figure>
+                            </div>
+                            <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 offset-xl-4 offset-lg-4">
+                                <div class="ps-block--shopping-total">
+                                    <div class="ps-block__header">
+                                        <p>Ara Toplam (KDV Hariç) <span> @Model.SubTotal.ToString("N2") ₺</span></p>
+                                        <p>Toplam KDV <span> +@Model.TotalVAT.ToString("N2") ₺</span></p>
+                                        @if (Model.DiscountAmount > 0)
+                                        {
+                                            <p>İndirim <span> -@Model.DiscountAmount.ToString("N2") ₺</span></p>
+                                        }
+                                        <p>Kargo <span> @(Model.ShippingCost == 0 ? "Ücretsiz" : "+" + Model.ShippingCost.ToString("N2") + " ₺")</span></p>
+                                    </div>
+                                    <div class="ps-block__content">
+                                        <h3>Toplam <span>@Model.TotalAmount.ToString("N2") ₺</span></h3>
+                                    </div>
+                                </div>
+                                <a class="ps-btn ps-btn--fullwidth" href="/odeme">Ödeme Yap</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        Sepetinizde ürün bulunmamaktadır. <a href="/magaza">Alışverişe başlayın.</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Scripts are now in wwwroot/js/cart.js
+    </script>
+}

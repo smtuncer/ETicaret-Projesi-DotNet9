@@ -1,0 +1,256 @@
+﻿@model SiteContent
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+	<div class="d-flex flex-column flex-column-fluid">
+		<div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+			<div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+				<div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+					<h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">İçerik Yönetimi</h1>
+					<ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+						<li class="breadcrumb-item text-muted">
+							<a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+						</li>
+						<li class="breadcrumb-item">
+							<span class="bullet bg-gray-500 w-5px h-2px"></span>
+						</li>
+						<li class="breadcrumb-item text-muted">İçerik Yönetimi</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div id="kt_app_content_container" class="app-container container-xxl">
+			<div class="card">
+				<form asp-action="Edit" method="post" enctype="multipart/form-data" class="form">
+					<input type="hidden" asp-for="Id">
+					@Html.AntiForgeryToken()
+					<div class="card-body p-9">
+						<!-- Sekmeler Başlangıcı -->
+						<ul class="nav nav-tabs nav-fill mb-5" id="myTab" role="tablist">
+							<li class="nav-item" role="presentation">
+								<button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">İletişim Bilgileri</button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="social-tab" data-bs-toggle="tab" data-bs-target="#social" type="button" role="tab" aria-controls="social" aria-selected="false">Sosyal Medya</button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="corporate-tab" data-bs-toggle="tab" data-bs-target="#corporate" type="button" role="tab" aria-controls="corporate" aria-selected="false">Kurumsal Satış</button>
+							</li>
+						</ul>
+						<!-- Sekmeler Bitişi -->
+						<div class="tab-content" id="myTabContent">
+							<!-- İletişim Bilgileri Sekmesi -->
+							<div class="tab-pane fade show active" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+								<div class="row mb-8">
+									<div class="col-xl-12">
+										<h4 class="fw-bold mb-4">İletişim Bilgileri</h4>
+									</div>
+									<div class="col-xl-3">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.ContactText, "İletişim Metni")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+											@Html.TextAreaFor(m => m.ContactText, new { @class = "form-control form-control-solid ", placeholder = "İletişim metni giriniz" })
+											@Html.ValidationMessageFor(m => m.ContactText, "", new { @class = "text-danger" })
+									</div>
+
+									<div class="col-xl-3">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.ContactAddress, "Adres")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.TextAreaFor(m => m.ContactAddress, new { @class = "form-control form-control-solid", placeholder = "Adres giriniz" })
+										@Html.ValidationMessageFor(m => m.ContactAddress, "", new { @class = "text-danger" })
+									</div>
+
+									<div class="col-xl-3 mt-4">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.ContactPhoneNumber, "Telefon Numarası")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.EditorFor(m => m.ContactPhoneNumber, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = "Telefon numarası giriniz" } })
+										@Html.ValidationMessageFor(m => m.ContactPhoneNumber, "", new { @class = "text-danger" })
+									</div>
+
+									<div class="col-xl-3 mt-4">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.ContactEmail, "Email")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.EditorFor(m => m.ContactEmail, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = "E-posta adresi giriniz" } })
+										@Html.ValidationMessageFor(m => m.ContactEmail, "", new { @class = "text-danger" })
+									</div>
+
+									<div class="col-xl-3 mt-4">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.ContactEmail, "Açılış Saatleri")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.EditorFor(m => m.ContactOpeningHour, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = "Açılış saatleri giriniz" } })
+										@Html.ValidationMessageFor(m => m.ContactOpeningHour, "", new { @class = "text-danger" })
+									</div>
+									<!-- ContactGoogleMap -->
+									<div class="col-xl-3 mt-4">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.ContactGoogleMap, "Google Harita URL'si")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.EditorFor(m => m.ContactGoogleMap, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = "Google Harita embed kodundaki src URL'sini giriniz" } })
+										@Html.ValidationMessageFor(m => m.ContactGoogleMap, "", new { @class = "text-danger" })
+										<small class="form-text text-muted mt-2">
+											<a href="#" data-bs-toggle="modal" data-bs-target="#googleMapInstructionsModal">Google Harita URL'sini nasıl alacağınızı öğrenin</a>
+										</small>
+									</div>
+
+									<!-- Google Map Instructions Modal -->
+									<div class="modal fade" id="googleMapInstructionsModal" tabindex="-1" aria-labelledby="googleMapInstructionsModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-lg">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title">Google Harita URL'si Nasıl Alınır?</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+												</div>
+												<div class="modal-body">
+													<ol>
+														<li><a href="https://www.google.com/maps" target="_blank">Google Haritalar</a> web sitesine gidin.</li>
+														<li>Haritada eklemek istediğiniz konumu arama çubuğuna yazın ve Enter tuşuna basın.</li>
+														<li>Bulunan konumun detaylarını görüntülemek için tıklayın.</li>
+														<li>Paylaş butonuna tıklayın ve <strong>"Haritayı Göm"</strong> sekmesine geçin.</li>
+														<li>Burada size bir <code>iframe</code> kodu verilecektir. Bu kodun içindeki <code>src</code> değerini kopyalayın.</li>
+														<li>Kopyaladığınız <code>src</code> URL'sini form alanına yapıştırın.</li>
+													</ol>
+													<p>Örnek <code>src</code> URL'si:</p>
+													<pre>https://www.google.com/maps/embed?pb=!1m18...your-map-code...</pre>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+												</div>
+											</div>
+										</div>
+									</div>
+
+
+									<!-- WhatsApp Telefon Numarası -->
+									<div class="col-xl-3 mt-4">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.WhatsappButtonPhoneNumber, "WhatsApp Numarası")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.EditorFor(m => m.WhatsappButtonPhoneNumber, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = "WhatsApp numarası giriniz" } })
+										@Html.ValidationMessageFor(m => m.WhatsappButtonPhoneNumber, "", new { @class = "text-danger" })
+									</div>
+
+									<!-- WhatsApp Otomatik Mesaj Metni -->
+									<div class="col-xl-3 mt-4">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.WhatsappButtonText, "WhatsApp Otomatik Mesaj")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.EditorFor(m => m.WhatsappButtonText, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = "Otomatik mesaj metni giriniz" } })
+										@Html.ValidationMessageFor(m => m.WhatsappButtonText, "", new { @class = "text-danger" })
+									</div>
+								</div>
+							</div>
+							<!-- İletişim Bilgileri Sekmesi Sonu -->
+							<!-- Sosyal Medya Sekmesi -->
+							<div class="tab-pane fade show" id="social" role="tabpanel" aria-labelledby="social-tab">
+								<div class="row mb-8">
+									<div class="col-xl-12">
+										<h4 class="fw-bold mb-4">Sosyal Medya URL'leri</h4>
+									</div>
+									@{
+										var socialMedia = new Dictionary<string, string>
+									{
+									{ nameof(Model.FacebookURL), "Facebook URL" },
+									{ nameof(Model.InstagramURL), "Instagram URL" },
+									{ nameof(Model.TwitterURL), "Twitter URL" },
+									{ nameof(Model.YoutubeURL), "Youtube URL" },
+									{ nameof(Model.LinkedinURL), "LinkedIn URL" }
+									};
+									}
+									@foreach (var item in socialMedia)
+									{
+										<div class="col-xl-3 mt-4">
+											<div class="fs-6 fw-semibold mt-2 mb-3">
+												@Html.LabelForModel(item.Value)
+											</div>
+										</div>
+										<div class="col-xl-9 fv-row mt-4">
+											@Html.Editor(item.Key, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = item.Value + " giriniz" } })
+											@Html.ValidationMessage(item.Key, "", new { @class = "text-danger" })
+										</div>
+									}
+								</div>
+							</div>
+							<!-- Sosyal Medya Sekmesi Sonu -->
+							<!-- Kurumsal Satış Sekmesi -->
+							<div class="tab-pane fade show" id="corporate" role="tabpanel" aria-labelledby="corporate-tab">
+								<div class="row mb-8">
+									<div class="col-xl-12">
+										<h4 class="fw-bold mb-4">Kurumsal Satış Sayfası</h4>
+									</div>
+									<div class="col-xl-3">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.CorporateSalesTitle, "Başlık")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.EditorFor(m => m.CorporateSalesTitle, new { htmlAttributes = new { @class = "form-control form-control-solid", placeholder = "Sayfa başlığı giriniz" } })
+										@Html.ValidationMessageFor(m => m.CorporateSalesTitle, "", new { @class = "text-danger" })
+									</div>
+
+									<div class="col-xl-3 mt-4">
+										<div class="fs-6 fw-semibold mt-2 mb-3">
+											@Html.LabelFor(m => m.CorporateSalesContent, "İçerik")
+										</div>
+									</div>
+									<div class="col-xl-9 fv-row mt-4">
+										@Html.TextAreaFor(m => m.CorporateSalesContent, new { @class = "form-control form-control-solid", rows = "10" })
+										@Html.ValidationMessageFor(m => m.CorporateSalesContent, "", new { @class = "text-danger" })
+									</div>
+								</div>
+							</div>
+							<!-- Kurumsal Satış Sekmesi Sonu -->
+						</div>
+
+					</div>
+
+					<div class="card-footer d-flex justify-content-end py-6 px-9">
+						<button type="reset" class="btn btn-light btn-active-light-primary me-2">Vazgeç</button>
+						<button type="submit" class="btn btn-success" id="kt_project_settings_submit">Değişiklikleri Kaydet</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#CorporateSalesContent').summernote({
+                height: 400,
+                placeholder: 'Kurumsal satış içeriğini buraya giriniz...',
+                toolbar: [
+                  ['style', ['style']],
+                  ['font', ['bold', 'underline', 'clear']],
+                  ['color', ['color']],
+                  ['para', ['ul', 'ol', 'paragraph']],
+                  ['table', ['table']],
+                  ['insert', ['link', 'picture', 'video']],
+                  ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+        });
+    </script>
+}

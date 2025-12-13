@@ -1,0 +1,269 @@
+﻿@model ECommerceApp.Areas.User.ViewModels.ProductListViewModel
+
+
+<div class="ps-page--shop" id="shop-sidebar">
+	<div class="container">
+		<div class="ps-layout--shop">
+			<div class="ps-layout__left">
+				<aside class="widget widget_shop">
+					<h4 class="widget-title">Kategoriler</h4>
+					<ul class="ps-list--categories">
+					<ul class="ps-list--categories">
+                        @{ ViewData["SelectedCategoryId"] = Model.SelectedCategoryId; }
+						@foreach (var category in Model.Categories)
+						{
+							<partial name="_SidebarCategoryItem" model="category" view-data="ViewData" />
+						}
+					</ul>
+					</ul>
+				</aside>
+				<aside class="widget widget_shop">
+					<h4 class="widget-title">Markalar</h4>
+					<form id="filterForm" asp-action="Index" method="get">
+						<input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+						<input type="hidden" name="sort" value="@Model.SortOrder" />
+						<input type="hidden" name="search" value="@Model.SearchTerm" />
+
+						<div class="form-group">
+							<input class="form-control" type="text" placeholder="Marka Ara..." id="brandSearch">
+						</div>
+						<figure class="ps-custom-scrollbar" data-height="250">
+							@foreach (var brand in Model.Brands)
+							{
+								<div class="ps-checkbox">
+									<input class="form-control brand-checkbox" type="checkbox" id="brand-@brand.Id" name="brandIds" value="@brand.Id" @(Model.SelectedBrandIds.Contains(brand.Id) ? "checked" : "") />
+									<label for="brand-@brand.Id">@brand.Name</label>
+								</div>
+							}
+						</figure>
+
+						<figure>
+							<h4 class="widget-title">Fiyat Aralığı</h4>
+							<div class="form-group">
+								<input class="form-control mb-2" type="number" name="minPrice" placeholder="Min" value="@Model.MinPrice">
+								<input class="form-control" type="number" name="maxPrice" placeholder="Max" value="@Model.MaxPrice">
+							</div>
+							<button type="submit" class="ps-btn" style="background-color: #C3408E; color: #ffffff; width: 100%;">Filtrele</button>
+						</figure>
+					</form>
+				</aside>
+			</div>
+			<div class="ps-layout__right">
+				<div class="ps-shopping ps-tab-root">
+					<div class="ps-shopping__header">
+						@if (!string.IsNullOrEmpty(Model.SelectedCategoryName))
+						{
+							<h3 style="margin-bottom:0px">@Model.SelectedCategoryName</h3>
+						}
+						<p><strong> @Model.TotalCount</strong> Ürün bulundu</p>
+						<div class="ps-shopping__actions">
+							<select class="ps-select" data-placeholder="Sıralama" onchange="location.href=this.value">
+								<option value="@Url.Action("Index", new { sort = "newest", categoryId = Model.SelectedCategoryId, search = Model.SearchTerm })" selected="@(Model.SortOrder == "newest")">En Yeniler</option>
+								<option value="@Url.Action("Index", new { sort = "price_asc", categoryId = Model.SelectedCategoryId, search = Model.SearchTerm })" selected="@(Model.SortOrder == "price_asc")">Fiyat: Düşükten Yükseğe</option>
+								<option value="@Url.Action("Index", new { sort = "price_desc", categoryId = Model.SelectedCategoryId, search = Model.SearchTerm })" selected="@(Model.SortOrder == "price_desc")">Fiyat: Yüksekten Düşüğe</option>
+								<option value="@Url.Action("Index", new { sort = "rating", categoryId = Model.SelectedCategoryId, search = Model.SearchTerm })" selected="@(Model.SortOrder == "rating")">Değerlendirme (En Yüksek)</option>
+							</select>
+
+						</div>
+					</div>
+					
+					@if (Model.SelectedBrandIds.Any() || Model.MinPrice.HasValue || Model.MaxPrice.HasValue || !string.IsNullOrEmpty(Model.SearchTerm))
+					{
+						<div class="ps-shopping__selected-filters" style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+							<span style="font-weight: bold; margin-right: 10px;">Seçili Filtreler:</span>
+							
+							@foreach (var brandId in Model.SelectedBrandIds)
+							{
+								var brand = Model.Brands.FirstOrDefault(b => b.Id == brandId);
+								if (brand != null)
+								{
+									<span class="badge badge-secondary" style="margin-right: 5px; padding: 8px; font-size: 14px; background-color: #C3408E; color: white;">@brand.Name</span>
+								}
+							}
+
+							@using System.Globalization
+						@{
+								var tr = new CultureInfo("tr-TR");
+							}
+
+							@if (Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+							{
+								<span class="badge badge-secondary" style="margin-right: 5px; padding: 8px; font-size: 14px; background-color: #C3408E; color: white;">
+									@(Model.MinPrice.HasValue? Model.MinPrice.Value.ToString("C0", tr) : "0") -
+									@(Model.MaxPrice.HasValue? Model.MaxPrice.Value.ToString("C0", tr) : "?")
+								</span>
+							}
+
+
+							@if (!string.IsNullOrEmpty(Model.SearchTerm))
+							{
+								<span class="badge badge-secondary" style="margin-right: 5px; padding: 8px; font-size: 14px; background-color: #C3408E; color: white;">
+									"@Model.SearchTerm"
+								</span>
+							}
+
+							<a asp-action="Index" asp-route-categoryId="@Model.SelectedCategoryId" class="text-danger" style="margin-left: 10px; text-decoration: underline;">Filtreleri Temizle</a>
+						</div>
+					}
+
+					<div class="ps-tabs">
+						<div class="ps-tab active" id="tab-1">
+							<div class="ps-shopping-product">
+								<div class="row">
+									@foreach (var product in Model.Products)
+									{
+										<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-6 ">
+											<div class="ps-product">
+												<div class="ps-product__thumbnail">
+													<a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">
+														<img loading="lazy" src="@(product.Images.FirstOrDefault()?.ImageUrl ?? "/martfury/img/products/shop/1.jpg")" alt="@product.Name" />
+													</a>
+                                                    @if (product.IsFeatured)
+                                                    {
+                                                        <div class="ps-product__badge">Öne Çıkan</div>
+                                                    }
+													<ul class="ps-product__actions">
+														<li><a href="javascript:void(0);" onclick="addToCart(@product.Id, 1)" data-bs-toggle="tooltip" data-placement="top" title="Sepete Ekle"><i class="icon-bag2"></i></a></li>
+														<li><a href="javascript:void(0);" onclick="toggleFavorite(@product.Id, this)" class="toggle-favorite" data-id="@product.Id" data-bs-toggle="tooltip" data-placement="top" title="Favorilere Ekle"><i class="icon-heart"></i></a></li>
+														<li><a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)" data-placement="top" title="İncele"><i class="icon-eye"></i></a></li>
+													</ul>
+												</div>
+												<div class="ps-product__container">
+													<a class="ps-product__vendor" href="#">@(product.Brand?.Name ?? "Markasız")</a>
+													<div class="ps-product__content">
+														<a class="ps-product__title" href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">@product.Name</a>
+                                                        <div class="ps-product__rating">
+                                                            @{
+                                                                var approvedComments = product.Comments.Where(c => c.IsApproved).ToList();
+                                                                var avgRating = approvedComments.Any() ? approvedComments.Average(c => c.Rating) : 0;
+                                                                var reviewCount = approvedComments.Count;
+                                                            }
+                                                            <select class="ps-rating" data-read-only="true">
+                                                                @for (int i = 1; i <= 5; i++)
+                                                                {
+                                                                    if (i <= Math.Round(avgRating))
+                                                                    {
+                                                                        <option value="1">1</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="0">0</option>
+                                                                    }
+                                                                }
+															</select>
+															@if (avgRating > 0)
+															{
+																<span>(@avgRating.ToString("N1"))</span>
+															}
+                                                        </div>
+														@if (product.Category != null)
+														{
+															<p class="mb-1"><small>Kategori: @product.Category.Name</small></p>
+														}
+														<p class="ps-product__price">@product.Price.ToString("N2") ₺</p>
+													</div>
+													<div class="ps-product__content hover">
+														<a class="ps-product__title" href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">@product.Name</a>
+                                                        <div class="ps-product__rating">
+                                                            <select class="ps-rating" data-read-only="true">
+                                                                @for (int i = 1; i <= 5; i++)
+                                                                {
+                                                                    if (i <= Math.Round(avgRating))
+                                                                    {
+                                                                        <option value="1">1</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="0">0</option>
+                                                                    }
+                                                                }
+                                                            </select>
+															@if (avgRating > 0)
+															{
+																<span>(@avgRating.ToString("N1"))</span>
+																}
+														</div>
+														<p class="ps-product__price">@product.Price.ToString("N2") ₺</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									}
+
+								</div>
+							</div>
+
+
+                        <!-- Pagination -->
+                        @if (Model.TotalPages > 1)
+                        {
+                            <div class="ps-pagination">
+                                <ul class="pagination">
+                                    @if (Model.CurrentPage > 1)
+                                    {
+                                        <li><a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-sort="@Model.SortOrder" asp-route-search="@Model.SearchTerm"><i class="icon-chevron-left"></i></a></li>
+                                    }
+                                    
+                                    @{
+                                        int startPage = Math.Max(1, Model.CurrentPage - 2);
+                                        int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+                                        if (startPage > 1)
+                                        {
+                                            <li><a asp-action="Index" asp-route-page="1" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-sort="@Model.SortOrder" asp-route-search="@Model.SearchTerm">1</a></li>
+                                            if (startPage > 2)
+                                            {
+                                                <li><span>...</span></li>
+                                            }
+                                        }
+
+                                        for (int i = startPage; i <= endPage; i++)
+                                        {
+                                            <li class="@(i == Model.CurrentPage ? "active" : "")">
+                                                <a asp-action="Index" asp-route-page="@i" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-sort="@Model.SortOrder" asp-route-search="@Model.SearchTerm">@i</a>
+                                            </li>
+                                        }
+
+                                        if (endPage < Model.TotalPages)
+                                        {
+                                            if (endPage < Model.TotalPages - 1)
+                                            {
+                                                <li><span>...</span></li>
+                                            }
+                                            <li><a asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-sort="@Model.SortOrder" asp-route-search="@Model.SearchTerm">@Model.TotalPages</a></li>
+                                        }
+                                    }
+                                    
+                                    @if (Model.CurrentPage < Model.TotalPages)
+                                    {
+                                        <li><a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-sort="@Model.SortOrder" asp-route-search="@Model.SearchTerm"><i class="icon-chevron-right"></i></a></li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Brand Search Functionality
+            $("#brandSearch").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $(".brand-checkbox").each(function() {
+                    var brandName = $(this).next("label").text().toLowerCase();
+                    if (brandName.indexOf(value) > -1) {
+                        $(this).parent(".ps-checkbox").show();
+                    } else {
+                        $(this).parent(".ps-checkbox").hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

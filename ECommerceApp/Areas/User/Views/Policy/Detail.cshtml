@@ -1,0 +1,23 @@
+@model ECommerceApp.Models.Policy
+
+<div class="ps-page--blog">
+    <div class="ps-post--detail">
+        <div class="ps-post__header">
+            <div class="container">
+                <h1>@Model.Title</h1>
+                <div class="ps-breadcrumb--2">
+                    <ul class="breadcrumb">
+                        <li><a asp-area="User" asp-controller="Home" asp-action="Index">Anasayfa</a></li>
+                        <li><a asp-action="Index">Politikalar</a></li>
+                        <li>@Model.Title</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="ps-post__content">
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+    </div>
+</div>

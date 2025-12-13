@@ -1,0 +1,425 @@
+@using ECommerceApp.Areas.User.ViewModels
+@model ProductDetailViewModel
+
+@{
+	ViewData["Title"] = Model.Product.Name;
+	var primaryImage = Model.ImageUrls.FirstOrDefault() ?? "/martfury/img/products/shop/1.jpg";
+	var secondaryImages = Model.ImageUrls.Skip(1).ToList();
+	var hasStock = Model.Product.Stock > 0;
+	string? rawDescription = Model.Product.Description;
+	string? plainDescription = string.IsNullOrWhiteSpace(rawDescription) 
+		? null 
+		: System.Text.RegularExpressions.Regex.Replace(rawDescription, "<.*?>", string.Empty);
+	
+	string? shortDescription = string.IsNullOrWhiteSpace(plainDescription)
+		? null
+		: (plainDescription.Length > 220
+			? $"{plainDescription.Substring(0, 220)}..."
+			: plainDescription);
+}
+
+@section Scripts
+{
+	<script>
+		(() => {
+			const quantityInput = document.getElementById('productQuantity');
+			if (!quantityInput) {
+				return;
+			}
+
+			const clampValue = () => {
+				const min = parseInt(quantityInput.min, 10) || 1;
+				const max = parseInt(quantityInput.max, 10) || min;
+				let value = parseInt(quantityInput.value, 10);
+
+				if (isNaN(value) || value < min) {
+					value = min;
+				}
+
+				if (value > max) {
+					value = max;
+				}
+
+				quantityInput.value = value;
+			};
+
+			quantityInput.addEventListener('change', clampValue);
+			quantityInput.addEventListener('blur', clampValue);
+		})();
+	</script>
+}
+
+<div class="ps-page--product">
+	<div class="container">
+		<div class="ps-page__container">
+			<div class="ps-page__left">
+				<div class="ps-product--detail">
+					<div class="ps-product__header">
+						<div class="ps-product__thumbnail" data-vertical="false">
+							<figure>
+								<div class="ps-wrapper">
+									<div class="ps-product__gallery" data-arrow="true">
+										@if (Model.ImageUrls != null && Model.ImageUrls.Any())
+										{
+											foreach (var image in Model.ImageUrls)
+											{
+												<div class="item">
+													<a href="@image">
+														<img loading="lazy" src="@image" alt="@Model.Product.Name">
+													</a>
+												</div>
+											}
+										}
+										else
+										{
+											<div class="item">
+												<a href="/martfury/img/products/shop/1.jpg">
+													<img loading="lazy" src="/martfury/img/products/shop/1.jpg" alt="@Model.Product.Name">
+												</a>
+											</div>
+										}
+									</div>
+								</div>
+							</figure>
+							<div class="ps-product__variants" data-item="4" data-md="3" data-sm="3" data-arrow="false">
+								@if (Model.ImageUrls != null && Model.ImageUrls.Any())
+								{
+									foreach (var image in Model.ImageUrls)
+									{
+										<div class="item">
+											<img loading="lazy" src="@image" alt="@Model.Product.Name">
+										</div>
+									}
+								}
+								else
+								{
+									<div class="item">
+										<img loading="lazy" src="/martfury/img/products/shop/1.jpg" alt="@Model.Product.Name">
+									</div>
+								}
+							</div>
+						</div>
+						<div class="ps-product__info">
+							<span class="ps-product__sku">SKU: @(string.IsNullOrWhiteSpace(Model.Product.SKU) ? "Belirtilmedi" : Model.Product.SKU)</span>
+							<h1>@Model.Product.Name</h1>
+							<div class="ps-product__meta">
+								<div class="ps-product__rating">
+									<select class="ps-rating" data-read-only="true">
+										@for (int i = 1; i <= 5; i++)
+										{
+											if (i <= Math.Round(Model.AverageRating))
+											{
+												<option value="1">1</option>
+											}
+											else
+											{
+												<option value="0">0</option>
+											}
+										}
+									</select>
+									<span>(@Model.TotalReviews)</span>
+								</div>
+								<p>Marka: <strong>@(string.IsNullOrWhiteSpace(Model.Product.BrandName) ? "Markasız" : Model.Product.BrandName)</strong></p>
+								@if (!string.IsNullOrWhiteSpace(Model.Product.CategoryName))
+								{
+									<p>Kategori: <strong>@Model.Product.CategoryName</strong></p>
+								}
+								<p>
+									Stok:
+									<strong class="@(hasStock ? "text-success" : "text-danger")">
+										@(hasStock ? $"{Model.Product.Stock} adet" : "Tükendi")
+									</strong>
+								</p>
+							</div>
+							<h4 class="ps-product__price">@Model.Product.Price.ToString("N2") @Model.Product.Currency</h4>
+							@if (!string.IsNullOrWhiteSpace(shortDescription))
+							{
+								<div class="ps-product__desc">
+									<p>@shortDescription</p>
+								</div>
+							}
+							<div class="ps-product__shopping extend">
+								@if (hasStock)
+								{
+									<div class="d-flex align-items-end">
+										<div class="form-group me-3 mb-0">
+											<label for="productQuantity" class="form-label mb-1">Adet</label>
+											<input type="number"
+												   id="productQuantity"
+												   class="form-control"
+												   style="width: 100px;"
+												   value="1"
+												   min="1"
+												   max="@Model.Product.Stock" />
+										</div>
+										<button type="button" class="ps-btn ps-btn--black" onclick="addToCart(@Model.Product.Id, document.getElementById('productQuantity').value)">Sepete Ekle</button>
+                                        <a href="javascript:void(0);" onclick="toggleFavorite(@Model.Product.Id, this)" class="btn-favorite-detail toggle-favorite @(Model.IsFavored ? "active" : "")" data-id="@Model.Product.Id" data-bs-toggle="tooltip" data-placement="top" title="@(Model.IsFavored ? "Favorilerden Çıkar" : "Favorilere Ekle")"><i class="icon-heart"></i></a>
+									</div>
+									<small class="text-muted d-block mt-2">Stok: @Model.Product.Stock</small>
+								}
+								else
+								{
+									<div class="alert alert-warning mb-0">Bu ürün geçici olarak stokta yok.</div>
+								}
+							</div>
+							<div class="ps-product__specification">
+								<p><strong>Eklenme Tarihi:</strong> @Model.Product.CreatedDate.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</p>
+							</div>
+						</div>
+					</div>
+						<div class="ps-product__content ps-tab-root">
+							<ul class="ps-tab-list">
+								<li class="active"><a href="#tab-1">Ürün Açıklaması</a></li>
+								<li><a href="#tab-2">Teknik Özellikler</a></li>
+								<li><a href="#tab-3">Yorumlar (@Model.Comments.Count)</a></li>
+							</ul>
+							<div class="ps-tabs">
+								<div class="ps-tab active" id="tab-1">
+									<div class="ps-document">
+										@if (!string.IsNullOrWhiteSpace(Model.Product.Description))
+										{
+											@Html.Raw(Model.Product.Description)
+										}
+										else
+										{
+											<p>Bu ürün için açıklama eklenmemiştir.</p>
+										}
+									</div>
+								</div>
+								<div class="ps-tab" id="tab-2">
+									<div class="table-responsive">
+										@if (Model.Attributes.Any())
+										{
+											<table class="table table-bordered ps-table ps-table--specification">
+												<tbody>
+													@foreach (var attr in Model.Attributes)
+													{
+														<tr>
+															<td>@attr.Name</td>
+															<td>@attr.Value</td>
+														</tr>
+													}
+												</tbody>
+											</table>
+										}
+										else
+										{
+											<p>Bu ürün için özellik bilgisi bulunamadı.</p>
+										}
+									</div>
+								</div>
+								<div class="ps-tab" id="tab-3">
+									<div class="ps-block--average-rating">
+										<div class="ps-block__header">
+											<h3>@Model.AverageRating.ToString("N1")</h3>
+											<select class="ps-rating" data-read-only="true">
+												@for (int i = 1; i <= 5; i++)
+												{
+													if (i <= Math.Round(Model.AverageRating))
+													{
+														<option value="1">1</option>
+													}
+													else
+													{
+														<option value="0">0</option>
+													}
+												}
+											</select>
+											<span>@Model.TotalReviews İnceleme</span>
+										</div>
+									</div>
+
+									@if (TempData["CommentSuccess"] != null)
+									{
+										<div class="alert alert-success mt-3">@TempData["CommentSuccess"]</div>
+									}
+									@if (TempData["CommentError"] != null)
+									{
+										<div class="alert alert-danger mt-3">@TempData["CommentError"]</div>
+									}
+
+									@if (Model.Comments.Any())
+									{
+										<div class="mt-5 mb-5">
+											@foreach (var comment in Model.Comments)
+											{
+												<div class="ps-review border-bottom pb-4 mb-4">
+													<div class="ps-review__content">
+														<header>
+															<div class="ps-review__header">
+																<div class="ps-review__rating mb-1">
+																	<select class="ps-rating" data-read-only="true">
+																		@for (int i = 1; i <= 5; i++)
+																		{
+																			if (i <= comment.Rating)
+																			{
+																				<option value="1">1</option>
+																			}
+																			else
+																			{
+																				<option value="0">0</option>
+																			}
+																		}
+																	</select>
+																	<span class="ms-2">@comment.Rating / 5</span>
+																</div>
+																<p class="mb-1"><strong>@comment.Name</strong> - @comment.CreatedDate.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</p>
+															</div>
+														</header>
+														<div class="ps-review__desc">
+															<p>@comment.Comment</p>
+														</div>
+														@if (!string.IsNullOrEmpty(comment.AdminReply))
+														{
+															<div class="ps-review__reply bg-light p-3 rounded mt-3 ms-4 border-start border-4 border-primary">
+																<p class="mb-1"><strong><i class="icon-user me-1"></i> Mağaza Yanıtı:</strong></p>
+																<p class="mb-0">@comment.AdminReply</p>
+															</div>
+														}
+													</div>
+												</div>
+											}
+										</div>
+									}
+									else
+									{
+										<p class="mt-4 mb-5">Henüz yorum yapılmamış. İlk yorumu siz yapın!</p>
+									}
+
+									@if (User.Identity.IsAuthenticated)
+									{
+										@if (Model.UserHasPurchased)
+										{
+											<form class="ps-form--review" asp-action="AddComment" method="post">
+												<h4>Yorum Yap</h4>
+												<p>E-posta adresiniz yayınlanmayacaktır. Gerekli alanlar işaretlenmiştir *</p>
+												<input type="hidden" name="productId" value="@Model.Product.Id" />
+												
+												<div class="form-group form-group__rating">
+													<label>Puanınız</label>
+													<select class="ps-rating" name="rating" data-read-only="false">
+														<option value="1">1</option>
+														<option value="2">2</option>
+														<option value="3">3</option>
+														<option value="4">4</option>
+														<option value="5" selected>5</option>
+													</select>
+												</div>
+												<div class="form-group">
+													<textarea class="form-control" name="comment" rows="6" placeholder="Yorumunuzu buraya yazın *" required></textarea>
+												</div>
+												<div class="row">
+													<div class="col-lg-6 col-md-6 col-sm-12 ">
+														<div class="form-group">
+															<input class="form-control" name="name" type="text" placeholder="Adınız *" required value="@User.Identity.Name" readonly>
+														</div>
+													</div>
+													<div class="col-lg-6 col-md-6 col-sm-12 ">
+														<div class="form-group">
+															<input class="form-control" name="email" type="email" placeholder="E-posta *" required value="@(User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value ?? "")" readonly>
+														</div>
+													</div>
+												</div>
+												<div class="form-group submit">
+													<button class="ps-btn">Yorumu Gönder</button>
+												</div>
+											</form>
+										}
+										else
+										{
+											<div class="alert alert-info mt-4">
+												<i class="icon-cart me-2"></i> Bu ürünü değerlendirmek için satın almış olmanız gerekmektedir.
+											</div>
+										}
+									}
+									else
+									{
+										<div class="alert alert-warning mt-4">
+											Yorum yapabilmek için lütfen <a href="/giris-yap?returnUrl=@Context.Request.Path" class="fw-bold">giriş yapın</a>.
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+
+						@if (Model.FeaturedProducts != null && Model.FeaturedProducts.Any())
+						{
+							<div class="ps-section--default ps-related-products mt-5">
+								<div class="ps-section__header">
+									<h3>Öne Çıkan Ürünler</h3>
+								</div>
+								<div class="ps-section__content">
+									<div class="ps-carousel--nav owl-slider" data-owl-auto="true" data-owl-loop="true" data-owl-speed="5000" data-owl-gap="30" data-owl-nav="true" data-owl-dots="true" data-owl-item="6" data-owl-item-xs="2" data-owl-item-sm="2" data-owl-item-md="3" data-owl-item-lg="4" data-owl-item-xl="5" data-owl-duration="1000" data-owl-mousedrag="on">
+										@foreach (var product in Model.FeaturedProducts)
+										{
+											<div class="ps-product">
+												<div class="ps-product__thumbnail">
+													<a href="@Url.Action("Detail", "Product", new { id = product.Id })">
+														<img loading="lazy" src="@(string.IsNullOrEmpty(product.PrimaryImageUrl) ? "/martfury/img/products/shop/1.jpg" : product.PrimaryImageUrl)" alt="@product.Name">
+													</a>
+													<div class="ps-product__badge">Öne Çıkan</div>
+													<ul class="ps-product__actions">
+														<li><a href="javascript:void(0);" onclick="addToCart(@product.Id, 1)" data-bs-toggle="tooltip" data-placement="top" title="Sepete Ekle"><i class="icon-bag2"></i></a></li>
+														<li><a href="javascript:void(0);" onclick="toggleFavorite(@product.Id, this)" class="toggle-favorite" data-id="@product.Id" data-bs-toggle="tooltip" data-placement="top" title="Favorilere Ekle"><i class="icon-heart"></i></a></li>
+														<li><a href="@Url.Action("Detail", "Product", new { id = product.Id })" data-bs-toggle="tooltip" data-placement="top" title="İncele"><i class="icon-eye"></i></a></li>
+													</ul>
+												</div>
+												<div class="ps-product__container">
+													<a class="ps-product__vendor" href="#">@(product.BrandName ?? "Markasız")</a>
+													<div class="ps-product__content">
+														<a class="ps-product__title" href="@Url.Action("Detail", "Product", new { id = product.Id })">@product.Name</a>
+														<p class="ps-product__price">@product.Price.ToString("N2") @product.Currency</p>
+													</div>
+													<div class="ps-product__content hover">
+														<a class="ps-product__title" href="@Url.Action("Detail", "Product", new { id = product.Id })">@product.Name</a>
+														<p class="ps-product__price">@product.Price.ToString("N2") @product.Currency</p>
+													</div>
+												</div>
+											</div>
+										}
+									</div>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+
+			<div class="ps-page__right">
+				<aside class="widget widget_product widget_features">
+					<p><i class="icon-network"></i> Dünya genelinde kargo gönderimi</p>
+					<p><i class="icon-3d-rotate"></i> 7 gün içinde kolay iade</p>
+					<p><i class="icon-receipt"></i> Tedarikçi bu ürün için fatura sağlar</p>
+					<p><i class="icon-credit-card"></i> Online ödeme veya havale/eft</p>
+				</aside>
+				@if (Model.RelatedProducts.Any())
+				{
+					<aside class="widget widget_same-brand">
+						<h3>Benzer Ürünler</h3>
+						<div class="widget__content">
+							@foreach (var related in Model.RelatedProducts)
+							{
+								<div class="ps-product">
+									<div class="ps-product__thumbnail">
+										<a asp-action="Detail" asp-route-id="@related.Id">
+											<img loading="lazy" src="@(related.PrimaryImageUrl ?? "/martfury/img/products/shop/1.jpg")" alt="@related.Name" />
+										</a>
+									</div>
+									<div class="ps-product__container">
+										<a class="ps-product__vendor" href="#">@(related.BrandName ?? "Markasız")</a>
+										<div class="ps-product__content">
+											<a class="ps-product__title" asp-action="Detail" asp-route-id="@related.Id">@related.Name</a>
+											<p class="ps-product__price">@related.Price.ToString("N2") @related.Currency</p>
+										</div>
+									</div>
+								</div>
+							}
+						</div>
+					</aside>
+				}
+			</div>
+		</div>
+
+
+	</div>
+</div>
+

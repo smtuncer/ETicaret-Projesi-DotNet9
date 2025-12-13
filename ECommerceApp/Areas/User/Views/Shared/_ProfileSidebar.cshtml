@@ -1,0 +1,101 @@
+<style>
+    .account-sidebar-card {
+        border: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .account-sidebar-header {
+        background-color: #C5A059;
+        padding: 20px;
+        color: #222;
+    }
+    
+    .account-sidebar-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .account-menu .list-group-item {
+        border: none;
+        border-bottom: 1px solid #f5f5f5;
+        padding: 15px 20px;
+        font-size: 15px;
+        color: #555;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .account-menu .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    .account-menu .list-group-item i {
+        margin-right: 12px;
+        font-size: 18px;
+        color: #999;
+        transition: all 0.2s;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .account-menu .list-group-item:hover, 
+    .account-menu .list-group-item.active {
+        background-color: #fff;
+        color: #C5A059;
+        padding-left: 25px;
+        font-weight: 500;
+    }
+    
+    .account-menu .list-group-item.active {
+        background-color: #fff9e6;
+    }
+
+    .account-menu .list-group-item:hover i,
+    .account-menu .list-group-item.active i {
+        color: #C5A059;
+    }
+</style>
+
+<aside class="account-sidebar-card bg-white mb-4">
+    <div class="account-sidebar-header">
+        <h3>Hesabım</h3>
+    </div>
+    <div class="list-group list-group-flush account-menu">
+        <a asp-area="User" asp-controller="Identity" asp-action="Index" 
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
+            <i class="icon-user"></i> Profil Bilgileri
+        </a>
+        <a asp-area="User" asp-controller="Identity" asp-action="Addresses" 
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["Action"].ToString() == "Addresses" ? "active" : "")">
+            <i class="icon-map-marker"></i> Adreslerim
+        </a>
+        <a asp-area="User" asp-controller="Identity" asp-action="Orders" 
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["Action"].ToString() == "Orders" ? "active" : "")">
+            <i class="icon-bag2"></i> Siparişlerim
+        </a>
+        <a asp-area="User" asp-controller="Identity" asp-action="Favorites" 
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["Action"].ToString() == "Favorites" ? "active" : "")">
+            <i class="icon-heart"></i> Favorilerim
+        </a>
+        <a asp-area="User" asp-controller="Identity" asp-action="PaymentNotifications" 
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["Action"].ToString() == "PaymentNotifications" || ViewContext.RouteData.Values["Action"].ToString() == "CreatePaymentNotification" ? "active" : "")">
+            <i class="icon-credit-card"></i> Ödeme Bildirimlerim
+        </a>
+        <a asp-area="User" asp-controller="Identity" asp-action="ReturnRequests" 
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["Action"].ToString() == "ReturnRequests" || ViewContext.RouteData.Values["Action"].ToString() == "CreateReturnRequest" ? "active" : "")">
+            <i class="icon-refresh"></i> İade Taleplerim
+        </a>
+        <a asp-area="User" asp-controller="Identity" asp-action="Reviews" 
+           class="list-group-item list-group-item-action @(ViewContext.RouteData.Values["Action"].ToString() == "Reviews" ? "active" : "")">
+            <i class="icon-star"></i> Değerlendirmelerim
+        </a>
+        <a asp-area="User" asp-controller="Identity" asp-action="Logout" 
+           class="list-group-item list-group-item-action text-danger">
+            <i class="icon-power-switch"></i> Çıkış Yap
+        </a>
+    </div>
+</aside>

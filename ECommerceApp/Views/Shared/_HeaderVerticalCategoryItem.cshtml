@@ -1,0 +1,61 @@
+@using ECommerceApp.Models
+@model Category
+
+@{
+    var activeSubs = Model.SubCategories?.Where(c => c.IsActive).OrderBy(c => c.Order).ThenBy(c => c.Name).ToList();
+    bool hasChildren = activeSubs != null && activeSubs.Any();
+    bool isRoot = ViewData["IsRoot"] as bool? ?? false;
+}
+
+@if (isRoot)
+{
+@using ECommerceApp.Helper
+
+<li class="@(hasChildren ? "menu-item-has-children has-mega-menu" : "")">
+    <a href="@Url.CategoryUrl(Model.Id, Model.Name)">
+        @Model.Name
+        @if (hasChildren)
+        {
+            <i class="icon-chevron-right sub-toggle-icon" style="float: right; font-size: 10px; margin-top: 5px;"></i>
+        }
+    </a>
+    @if (hasChildren)
+    {
+        <div class="mega-menu">
+            <div class="mega-menu__column">
+                <ul class="mega-menu__list">
+                    @foreach (var sub in activeSubs)
+                    {
+                        var viewData = new ViewDataDictionary(ViewData);
+                        viewData["IsRoot"] = false;
+                        <partial name="_HeaderVerticalCategoryItem" model="sub" view-data="viewData" />
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</li>
+}
+else
+{
+<li class="@(hasChildren ? "menu-item-has-children" : "")">
+    <a href="@Url.CategoryUrl(Model.Id, Model.Name)">
+            @Model.Name
+            @if (hasChildren)
+            {
+                <i class="icon-chevron-right sub-toggle-icon" style="float: right; font-size: 10px; margin-top: 5px;"></i>
+            }
+        </a>
+        @if (hasChildren)
+        {
+            <ul class="sub-menu">
+                @foreach (var sub in activeSubs)
+                {
+                    var viewData = new ViewDataDictionary(ViewData);
+                    viewData["IsRoot"] = false;
+                    <partial name="_HeaderVerticalCategoryItem" model="sub" view-data="viewData" />
+                }
+            </ul>
+        }
+    </li>
+}

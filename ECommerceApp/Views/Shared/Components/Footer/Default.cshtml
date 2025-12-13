@@ -1,0 +1,118 @@
+@using System
+@model ECommerceApp.Areas.User.ViewModels.FooterViewModel
+
+<footer class="ps-footer ps-footer--3">
+    <div class="container">
+        <div class="ps-footer__widgets">
+            <aside class=" widget_footer widget_contact-us">
+                <h4 class="widget-title">Bize Ulaşın</h4>
+
+                <a class="ps-logo" href="/" style="display: block; margin-bottom: 20px;"><img src="~/luxda-logo.png" alt="Luxda Logo" style="max-width: 150px;"></a>
+                <div class="widget_content contact-widget-content">
+                    @{
+                        var contactText = Model.ContactInfo.ContactText ?? "7/24 Bize Ulaşabilirsiniz";
+                        var trimmedText = contactText.Length > 140 ? contactText.Substring(0, 137) + "..." : contactText;
+                    }
+                    <p class="contact-widget-text">@trimmedText</p>
+                    @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.ContactPhoneNumber))
+                    {
+                        <h3><a class="contact-link" style="fpnt-size:18px" href="tel:@Model.ContactInfo.ContactPhoneNumber">@Model.ContactInfo.ContactPhoneNumber</a></h3>
+                    }
+                    <p>
+                        @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.ContactAddress))
+                        {
+                            var addressLink = string.Empty;
+                            if (!string.IsNullOrWhiteSpace(Model.ContactInfo.ContactGoogleMap))
+                            {
+                                var raw = Model.ContactInfo.ContactGoogleMap;
+                                if (raw.Contains("iframe", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    var srcIndex = raw.IndexOf("src=\"", StringComparison.OrdinalIgnoreCase);
+                                    if (srcIndex >= 0)
+                                    {
+                                        srcIndex += 5;
+                                        var endIndex = raw.IndexOf("\"", srcIndex, StringComparison.OrdinalIgnoreCase);
+                                        if (endIndex > srcIndex)
+                                        {
+                                            addressLink = raw.Substring(srcIndex, endIndex - srcIndex);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    addressLink = raw;
+                                }
+                            }
+                            if (string.IsNullOrWhiteSpace(addressLink))
+                            {
+                                addressLink = $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(Model.ContactInfo.ContactAddress)}";
+                            }
+
+                            <a class="contact-link" href="@addressLink" target="_blank" rel="noopener">@Model.ContactInfo.ContactAddress</a><br />
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.ContactEmail))
+                        {
+                            <a class="contact-link" href="mailto:@Model.ContactInfo.ContactEmail">@Model.ContactInfo.ContactEmail</a>
+                        }
+                    </p>
+                    <ul class="ps-list--social">
+                        @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.FacebookURL))
+                        {
+                            <li><a class="facebook" href="@Model.ContactInfo.FacebookURL" target="_blank" rel="noopener"><i class="fab fa-facebook"></i></a></li>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.TwitterURL))
+                        {
+                            <li><a class="twitter" href="@Model.ContactInfo.TwitterURL" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a></li>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.YoutubeURL))
+                        {
+                            <li><a class="google-plus" href="@Model.ContactInfo.YoutubeURL" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a></li>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.InstagramURL))
+                        {
+                            <li><a class="instagram" href="@Model.ContactInfo.InstagramURL" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a></li>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.ContactInfo.LinkedinURL))
+                        {
+                            <li><a class="linkedin" href="@Model.ContactInfo.LinkedinURL" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a></li>
+                        }
+                    </ul>
+                </div>
+            </aside>
+            <aside class=" widget_footer">
+                <h4 class="widget-title">LuxdaNet</h4>
+                <ul class="ps-list--link">
+                    <li><a asp-area="User" asp-controller="Home" asp-action="AboutUs">Hakkımızda</a></li>
+                    <li><a asp-area="User" asp-controller="Home" asp-action="CorporateSales">Kurumsal Satış</a></li>
+                    <li><a asp-area="User" asp-controller="Home" asp-action="BankAccounts">Banka Hesapları</a></li>
+                    <li><a asp-area="User" asp-controller="Blog" asp-action="Index">Blog</a></li>
+                    <li><a asp-area="User" asp-controller="Home" asp-action="Contact">İletişim</a></li>
+                </ul>
+            </aside>
+            <aside class=" widget_footer">
+                <h4 class="widget-title">Müşteri Bilgilendirme</h4>
+                <ul class="ps-list--link">
+                    @if (Model.Policies != null && Model.Policies.Any())
+                    {
+                        foreach (var policy in Model.Policies)
+                        {
+                            <li><a asp-area="User" asp-controller="Policy" asp-action="Detail" asp-route-slug="@policy.Slug">@policy.Title</a></li>
+                        }
+                    }
+                </ul>
+            </aside>
+            <aside class=" widget_footer">
+                <h4 class="widget-title">Popüler</h4>
+                <ul class="ps-list--link">
+                    <li><a href="/one-cikan-urunler">Öne Çıkan Ürünler</a></li>
+                    <li><a href="/urunler?sort=bestseller">Çok Satan Ürünler</a></li>
+                    <li><a href="/urunler?sort=newest">Yeni Gelen Ürünler</a></li>
+                </ul>
+            </aside>
+        </div>
+        <div class="ps-footer__copyright">
+            <p>&copy; @DateTime.Now.Year Luxda. Tüm Hakları Saklıdır</p>
+            <p><a href="https://www.iyzico.com/" target="_blank"><img src="~/logo_band_colored@2x.png" alt="Iyzico" style="width:auto; height:17px" /></a></p>
+        </div>
+    </div>
+</footer>

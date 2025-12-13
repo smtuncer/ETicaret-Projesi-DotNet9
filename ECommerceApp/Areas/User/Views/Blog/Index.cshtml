@@ -1,0 +1,119 @@
+﻿@model List<ECommerceApp.Models.Blog>
+@{
+    ViewData["Title"] = "Blog";
+}
+
+<div class="ps-page--blog">
+    <div class="container">
+        <div class="ps-page__header">
+            <h1>Blog</h1>
+            <div class="ps-breadcrumb--2">
+                <ul class="breadcrumb">
+                    <li><a asp-controller="Home" asp-action="Index">Anasayfa</a></li>
+                    <li>Blog</li>
+                </ul>
+            </div>
+        </div>
+        <div class="ps-blog--sidebar">
+            <div class="ps-blog__left">
+                @foreach (var item in Model)
+                {
+                    var shortDescription = item.Summary;
+                    if (string.IsNullOrEmpty(shortDescription) && !string.IsNullOrEmpty(item.Content))
+                    {
+                        var plainText = System.Text.RegularExpressions.Regex.Replace(item.Content, "<.*?>", string.Empty);
+                        shortDescription = plainText.Length > 150 ? plainText.Substring(0, 150) + "..." : plainText;
+                    }
+
+                    <div class="ps-post ps-post--small-thumbnail">
+                        <div class="ps-post__thumbnail">
+                            <a class="ps-post__overlay" asp-action="Detail" asp-route-slug="@item.Slug" asp-route-id="@item.Id"></a>
+                            <img loading="lazy" src="@item.FeaturedImage" alt="@item.Title">
+                        </div>
+                        <div class="ps-post__content">
+                            <div class="ps-post__top">
+                                <div class="ps-post__meta">
+                                    @if(item.Category != null) {
+                                        <a asp-action="Index" asp-route-categoryId="@item.CategoryId">@item.Category.Name</a>
+                                    }
+                                </div>
+                                <a class="ps-post__title" asp-action="Detail" asp-route-slug="@item.Slug" asp-route-id="@item.Id">@item.Title</a>
+                                <p>@shortDescription</p>
+                            </div>
+                            <div class="ps-post__bottom">
+                                <p><span> @(item.Author?.Name + " " + item.Author?.Surname ?? "Admin")</span> |  @item.PublishedDate?.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR")) </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Pagination -->
+                <div class="ps-pagination">
+                    <ul class="pagination">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li><a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-categoryId="@ViewBag.CategoryId" asp-route-search="@ViewBag.Search"><i class="icon-chevron-left"></i></a></li>
+                        }
+                        
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="@(i == ViewBag.CurrentPage ? "active" : "")"><a asp-action="Index" asp-route-page="@i" asp-route-categoryId="@ViewBag.CategoryId" asp-route-search="@ViewBag.Search">@i</a></li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li><a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-categoryId="@ViewBag.CategoryId" asp-route-search="@ViewBag.Search"><i class="icon-chevron-right"></i></a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="ps-blog__right">
+                <aside class="widget widget--blog widget--search">
+                    <form class="ps-form--widget-search" asp-action="Index" method="get">
+                        <input class="form-control" type="text" name="search" value="@ViewBag.Search" placeholder="Ara...">
+                        <button><i class="icon-magnifier"></i></button>
+                    </form>
+                </aside>
+                <aside class="widget widget--blog widget--categories">
+                    <h3 class="widget__title">Kategoriler</h3>
+                    <div class="widget__content">
+                        <ul>
+                            @if(ViewBag.Categories != null)
+                            {
+                                foreach (var category in ViewBag.Categories)
+                                {
+                                    <li><a asp-action="Index" asp-route-categoryId="@category.Id">@category.Name</a></li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </aside>
+                <aside class="widget widget--blog widget--recent-post">
+                    <h3 class="widget__title">Son Yazılar</h3>
+                    <div class="widget__content">
+                        @if(ViewBag.RecentBlogs != null)
+                        {
+                            foreach (var blog in ViewBag.RecentBlogs)
+                            {
+                                <a asp-action="Detail" asp-route-slug="@blog.Slug" asp-route-id="@blog.Id">@blog.Title</a>
+                            }
+                        }
+                    </div>
+                </aside>
+                <aside class="widget widget--blog widget--recent-comments">
+                    <h3 class="widget__title">Son Yorumlar</h3>
+                    <div class="widget__content">
+                         @if(ViewBag.RecentComments != null)
+                        {
+                            foreach (var comment in ViewBag.RecentComments)
+                            {
+                                <p><span class="author">@comment.Name</span> - <a asp-action="Detail" asp-route-slug="@comment.Blog?.Slug" asp-route-id="@comment.BlogId"> @comment.Blog?.Title</a></p>
+                            }
+                        }
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>

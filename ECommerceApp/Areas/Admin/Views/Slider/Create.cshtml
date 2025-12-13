@@ -1,0 +1,114 @@
+@model ECommerceApp.Models.Slider
+
+@{
+    ViewData["Title"] = "Yeni Slider";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Yeni Slider</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Slider" asp-action="Index" class="text-muted text-hover-primary">Slider</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Yeni Ekle</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div class="card mb-5 mb-xl-10">
+                        <div class="card-header border-0 cursor-pointer">
+                            <div class="card-title m-0">
+                                <h3 class="fw-bold m-0">Slider Bilgileri</h3>
+                            </div>
+                        </div>
+                        <div class="card-body border-top p-9">
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">Başlık</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" asp-for="Title" class="form-control form-control-lg form-control-solid" placeholder="Slider başlığı" />
+                                    <span asp-validation-for="Title" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Alt Başlık</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" asp-for="Subtitle" class="form-control form-control-lg form-control-solid" placeholder="Alt başlık (opsiyonel)" />
+                                    <span asp-validation-for="Subtitle" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Açıklama</label>
+                                <div class="col-lg-8 fv-row">
+                                    <textarea asp-for="Description" class="form-control form-control-lg form-control-solid" rows="3" placeholder="Açıklama metni (opsiyonel)"></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">Masaüstü Görseli</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="file" asp-for="ImageUpload" class="form-control form-control-lg form-control-solid" accept="image/*" />
+                                    <span asp-validation-for="ImageUpload" class="text-danger"></span>
+                                    <div class="form-text">Önerilen boyut: 1920x600px (JPG, PNG)</div>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Mobil Görseli</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="file" asp-for="MobileImageUpload" class="form-control form-control-lg form-control-solid" accept="image/*" />
+                                    <span asp-validation-for="MobileImageUpload" class="text-danger"></span>
+                                    <div class="form-text">Önerilen boyut: 768x600px (JPG, PNG)</div>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Link URL</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" asp-for="LinkUrl" class="form-control form-control-lg form-control-solid" placeholder="/urunler (opsiyonel)" />
+                                    <span asp-validation-for="LinkUrl" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Buton Metni</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" asp-for="ButtonText" class="form-control form-control-lg form-control-solid" placeholder="Şimdi Keşfet (opsiyonel)" />
+                                    <span asp-validation-for="ButtonText" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Sıra</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="number" asp-for="Order" class="form-control form-control-lg form-control-solid" value="0" />
+                                    <span asp-validation-for="Order" class="text-danger"></span>
+                                    <div class="form-text">Küçük sayı önce gösterilir</div>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Aktif mi?</label>
+                                <div class="col-lg-8 fv-row">
+                                    <div class="form-check form-check-solid form-switch fv-row">
+                                        <input class="form-check-input w-45px h-30px" type="checkbox" asp-for="IsActive" checked />
+                                        <label class="form-check-label" asp-for="IsActive"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-end py-6 px-9">
+                            <a asp-action="Index" class="btn btn-light me-3">İptal</a>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

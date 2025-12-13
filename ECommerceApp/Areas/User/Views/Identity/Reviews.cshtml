@@ -1,0 +1,165 @@
+@model List<ECommerceApp.Models.ProductComment>
+@{
+    ViewData["Title"] = "Değerlendirmelerim";
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+}
+
+<div class="ps-page--my-account bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <partial name="_ProfileSidebar" />
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0 fw-bold text-dark">Değerlendirmelerim</h3>
+                            <p class="text-muted small mt-1 mb-0">Ürünlere yaptığınız yorumları ve puanları görüntüleyin.</p>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (Model != null && Model.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="bg-light text-muted small text-uppercase">
+                                        <tr>
+                                            <th class="py-3 ps-4 rounded-start">Ürün</th>
+                                            <th class="py-3">Puan</th>
+                                            <th class="py-3">Yorum</th>
+                                            <th class="py-3">Tarih</th>
+                                            <th class="py-3 pe-4 rounded-end">Durum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="border-0">
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <a href="@Url.ProductUrl(item.ProductId, item.Product?.Name ?? "", item.Product?.Slug)" target="_blank" class="fw-bold text-dark text-decoration-none hover-primary">
+                                                        @item.Product?.Name
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <div class="ps-rating" data-read-only="true">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            if (i <= item.Rating)
+                                                            {
+                                                                <i class="fa fa-star text-warning"></i>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="fa fa-star-o text-muted"></i>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td style="max-width: 300px;">
+                                                    <p class="mb-1 text-muted small">@item.Comment</p>
+                                                    @if(!string.IsNullOrEmpty(item.AdminReply))
+                                                    {
+                                                        <div class="bg-soft-primary p-2 mt-2 rounded border-start border-3 border-primary small">
+                                                            <strong class="text-primary"><i class="icon-user me-1"></i> Mağaza Yanıtı:</strong> <span class="text-dark">@item.AdminReply</span>
+                                                        </div>
+                                                    }
+                                                </td>
+                                                <td class="text-muted small">@item.CreatedDate.ToString("dd.MM.yyyy")</td>
+                                                <td class="pe-4">
+                                                    @if (item.IsApproved)
+                                                    {
+                                                        <span class="badge bg-soft-success text-success rounded-pill px-3">Onaylandı</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-soft-warning text-warning rounded-pill px-3">Onay Bekliyor</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (totalPages > 1)
+                            {
+                                <div class="d-flex justify-content-center mt-4">
+                                    <ul class="pagination">
+                                        @if (currentPage > 1)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-action="Reviews" asp-route-page="@(currentPage - 1)">«</a>
+                                            </li>
+                                        }
+
+                                        @for (int i = 1; i <= totalPages; i++)
+                                        {
+                                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                                <a class="page-link" asp-action="Reviews" asp-route-page="@i">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (currentPage < totalPages)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-action="Reviews" asp-route-page="@(currentPage + 1)">»</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 bg-light rounded-3 border border-dashed">
+                                <i class="icon-star fs-1 text-muted mb-3 opacity-50"></i>
+                                <p class="text-muted mb-0">Henüz hiç değerlendirmeniz bulunmamaktadır.</p>
+                                <a asp-controller="Product" asp-action="Index" class="btn btn-link text-primary mt-2">Alışverişe Başla ve Yorum Yap</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-soft-primary {
+        background-color: rgba(197, 160, 89, 0.1);
+    }
+    .text-primary {
+        color: #C5A059 !important;
+    }
+    
+    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); }
+    .text-warning { color: #ffc107 !important; }
+    
+    .bg-soft-success { background-color: rgba(25, 135, 84, 0.1); }
+    .text-success { color: #198754 !important; }
+    
+    .text-muted { color: #adb5bd !important; }
+
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.5rem;
+        border-bottom-color: #f5f5f5;
+    }
+    
+    .border-dashed {
+        border-style: dashed !important;
+    }
+    
+    .hover-primary:hover {
+        color: #C5A059 !important;
+    }
+    
+    .btn-link {
+        text-decoration: none;
+    }
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+</style>

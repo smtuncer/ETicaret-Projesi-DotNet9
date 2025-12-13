@@ -1,0 +1,209 @@
+@model ECommerceApp.Models.Product
+
+@{
+    ViewData["Title"] = "Ürün Detayı";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Ürün Detayı</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-action="Index" class="text-muted text-hover-primary">Ürünler</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">@Model.Name</li>
+                    </ul>
+                </div>
+                <div class="card-toolbar">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-primary me-2">
+                        <i class="ki-duotone ki-pencil fs-2"></i>Düzenle
+                    </a>
+                    <a asp-action="Index" class="btn btn-sm btn-light">
+                        <i class="ki-duotone ki-arrow-left fs-2"></i>Geri Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card mb-5 mb-xl-10">
+                    <div class="card-header cursor-pointer">
+                        <div class="card-title m-0">
+                            <h3 class="fw-bold m-0">Ürün Bilgileri</h3>
+                        </div>
+                    </div>
+                    <div class="card-body p-9">
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Ürün Adı</label>
+                            <div class="col-lg-8">
+                                <span class="fw-bold fs-6 text-gray-800">@Model.Name</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">SKU</label>
+                            <div class="col-lg-8 fv-row">
+                                <span class="fw-semibold text-gray-800 fs-6">@Model.SKU</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Barkod</label>
+                            <div class="col-lg-8 fv-row">
+                                <span class="fw-semibold text-gray-800 fs-6">@Model.Barcode</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Fiyat</label>
+                            <div class="col-lg-8 fv-row">
+                                <span class="fw-semibold text-gray-800 fs-6">@Model.Price @Model.Currency</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Bayi Fiyatı</label>
+                            <div class="col-lg-8 fv-row">
+                                <span class="fw-semibold text-gray-800 fs-6">@Model.DealerPrice @Model.Currency</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">KDV</label>
+                            <div class="col-lg-8 fv-row">
+                                <span class="fw-semibold text-gray-800 fs-6">%@Model.VAT</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Stok</label>
+                            <div class="col-lg-8 fv-row">
+                                @if (Model.Stock > 0)
+                                {
+                                    <span class="badge badge-success">@Model.Stock</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">Stok Yok</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Kategori</label>
+                            <div class="col-lg-8 fv-row">
+                                <span class="fw-semibold text-gray-800 fs-6">@(Model.Category?.Name ?? "-")</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Marka</label>
+                            <div class="col-lg-8 fv-row">
+                                <span class="fw-semibold text-gray-800 fs-6">@(Model.Brand?.Name ?? "-")</span>
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Durum</label>
+                            <div class="col-lg-8 fv-row">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge badge-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">Pasif</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="row mb-7">
+                            <label class="col-lg-4 fw-semibold text-muted">Açıklama</label>
+                            <div class="col-lg-8 fv-row">
+                                <div class="fw-semibold text-gray-800 fs-6">@Html.Raw(Model.Description)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attributes -->
+                <div class="card mb-5 mb-xl-10">
+                    <div class="card-header cursor-pointer">
+                        <div class="card-title m-0">
+                            <h3 class="fw-bold m-0">Ürün Özellikleri</h3>
+                        </div>
+                    </div>
+                    <div class="card-body p-9">
+                        @if (Model.Attributes != null && Model.Attributes.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                    <thead>
+                                        <tr class="fw-bold text-muted">
+                                            <th class="min-w-150px">Özellik Adı</th>
+                                            <th class="min-w-150px">Değer</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var attr in Model.Attributes)
+                                        {
+                                            <tr>
+                                                <td>@attr.Name</td>
+                                                <td>@attr.Value</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">Bu ürün için özellik bulunamadı.</div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="card mb-5 mb-xl-10">
+                    <div class="card-header cursor-pointer">
+                        <div class="card-title m-0">
+                            <h3 class="fw-bold m-0">Ürün Görselleri</h3>
+                        </div>
+                    </div>
+                    <div class="card-body p-9">
+                        @if (Model.Images != null && Model.Images.Any())
+                        {
+                            <div class="row g-5">
+                                @foreach (var img in Model.Images.OrderBy(i => i.SortOrder))
+                                {
+                                    <div class="col-md-3">
+                                        <div class="card overlay overflow-hidden">
+                                            <div class="card-body p-0">
+                                                <div class="overlay-wrapper">
+                                                    <img src="@img.ImageUrl" alt="" class="w-100 rounded"/>
+                                                </div>
+                                                <div class="overlay-layer bg-dark bg-opacity-10">
+                                                    @if (img.IsMain)
+                                                    {
+                                                        <span class="badge badge-primary">Ana Görsel</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">Bu ürün için görsel bulunamadı.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

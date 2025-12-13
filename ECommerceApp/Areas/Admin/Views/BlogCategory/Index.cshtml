@@ -1,0 +1,293 @@
+@model IEnumerable<BlogCategory>
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Blog Kategorileri</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Blog Kategorileri</li>
+                    </ul>
+                </div>
+                <div class="card-toolbar">
+                    <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="ki-duotone ki-plus fs-2"></i>Yeni Kategori Ekle
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card mb-5 mb-xl-8">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">Toplam @Model.Count() Kategori</span>
+                        </h3>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="table-responsive">
+                            <table class="table align-middle gs-0 gy-4">
+                                <thead>
+                                    <tr class="fw-bold text-muted bg-light">
+                                        <th class="ps-4 rounded-start">Kategori Adı</th>
+                                        <th>Açıklama</th>
+                                        <th>Sıra</th>
+                                        <th>Durum</th>
+                                        <th>Oluşturma Tarihi</th>
+                                        <th class="rounded-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="text-gray-900 fw-bold fs-6">@category.Name</span>
+                                            </td>
+                                            <td>@(category.Description ?? "-")</td>
+                                            <td>@category.DisplayOrder</td>
+                                            <td>
+                                                @if (category.IsActive)
+                                                {
+                                                    <span class="badge badge-light-success">Aktif</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light-danger">Pasif</span>
+                                                }
+                                            </td>
+                                            <td>@category.CreatedDate.ToString("dd.MM.yyyy")</td>
+                                            <td>
+                                                <a href="#" class="btn btn-success btn-sm px-4 me-2" data-bs-toggle="modal" data-bs-target="#editModal-@category.Id">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <a href="#" class="btn btn-danger btn-sm px-4" data-bs-toggle="modal" data-bs-target="#deleteModal-@category.Id">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </a>
+
+                                                <!-- Delete Modal -->
+                                                <div class="modal fade" id="deleteModal-@category.Id" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                                                        <div class="modal-content rounded">
+                                                            <div class="modal-header pb-0 border-0 justify-content-end">
+                                                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                                <div class="mb-13 text-center">
+                                                                    <h1 class="mb-3">Kategori Sil</h1>
+                                                                    <div class="text-muted fw-semibold fs-5">Bu işlem geri alınamaz!</div>
+                                                                </div>
+                                                                <div class="mb-13">
+                                                                    <div class="text-center">
+                                                                        <h4 class="fw-bold">@category.Name</h4>
+                                                                        <p><strong>Açıklama:</strong> @(category.Description ?? "-")</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="text-center">
+                                                                    <button type="button" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                                                                    <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger">
+                                                                        <span class="indicator-label">Sil</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Edit Modal -->
+                                                <div class="modal fade" id="editModal-@category.Id" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                                                        <div class="modal-content rounded">
+                                                            <div class="modal-header pb-0 border-0 justify-content-end">
+                                                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                                                </div>
+                                                            </div>
+                                                            <form asp-action="Edit" method="Post">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="Id" value="@category.Id" />
+                                                                <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                                    <div class="text-center mb-13">
+                                                                        <h1 class="mb-3">Kategori Düzenle</h1>
+                                                                        <div class="text-muted fw-semibold fs-5">Kategori bilgilerini güncelleyin</div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-4 col-form-label required fw-semibold fs-6">Kategori Adı</label>
+                                                                        <div class="col-lg-8">
+                                                                            <input type="text" name="Name" class="form-control form-control-lg form-control-solid" value="@category.Name" required />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">Açıklama</label>
+                                                                        <div class="col-lg-8">
+                                                                            <textarea name="Description" class="form-control form-control-lg form-control-solid" rows="3">@category.Description</textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">Sıra</label>
+                                                                        <div class="col-lg-8">
+                                                                            <input type="number" name="DisplayOrder" class="form-control form-control-lg form-control-solid" value="@category.DisplayOrder" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-4 col-form-label fw-semibold fs-6"></label>
+                                                                        <div class="col-lg-8">
+                                                                            <div class="form-check form-check-custom form-check-solid">
+                                                                                <input class="form-check-input" type="checkbox" name="IsActive" value="true" @(category.IsActive ? "checked" : "") />
+                                                                                <label class="form-check-label">Aktif</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="text-center">
+                                                                        <button type="button" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                                                                        <button type="submit" class="btn btn-primary">
+                                                                            <span class="indicator-label">Değişiklikleri Kaydet</span>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        @{
+                            int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+                            int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+                            int windowSize = 5;
+                            int startPage = Math.Max(1, currentPage - 2);
+                            int endPage = Math.Min(totalPages, startPage + windowSize - 1);
+                            if (endPage - startPage < windowSize - 1)
+                            {
+                                startPage = Math.Max(1, endPage - windowSize + 1);
+                            }
+                        }
+
+                        @if (totalPages > 1)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mt-5 px-4 pb-4">
+                                <div class="text-muted">
+                                    Sayfa @currentPage / @totalPages
+                                </div>
+                                <ul class="pagination">
+                                    @if (currentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)">Önceki</a>
+                                        </li>
+                                    }
+
+                                    @if (startPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="1">1</a>
+                                        </li>
+                                        @if (startPage > 2)
+                                        {
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        }
+                                    }
+
+                                    @for (int i = startPage; i <= endPage; i++)
+                                    {
+                                        <li class="page-item @(i == currentPage ? "active" : "")">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (endPage < totalPages)
+                                    {
+                                        if (endPage < totalPages - 1)
+                                        {
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        }
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@totalPages">@totalPages</a>
+                                        </li>
+                                    }
+
+                                    @if (currentPage < totalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)">Sonraki</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Add Category Modal -->
+                <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                        <div class="modal-content rounded">
+                            <div class="modal-header pb-0 border-0 justify-content-end">
+                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                </div>
+                            </div>
+                            <form asp-action="Create" method="Post">
+                                @Html.AntiForgeryToken()
+                                <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                    <div class="text-center mb-13">
+                                        <h1 class="mb-3">Yeni Kategori Ekle</h1>
+                                        <div class="text-muted fw-semibold fs-5">Kategori bilgilerini girin</div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-4 col-form-label required fw-semibold fs-6">Kategori Adı</label>
+                                        <div class="col-lg-8">
+                                            <input type="text" name="Name" class="form-control form-control-lg form-control-solid" placeholder="Kategori adı" required />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">Açıklama</label>
+                                        <div class="col-lg-8">
+                                            <textarea name="Description" class="form-control form-control-lg form-control-solid" rows="3" placeholder="Kategori açıklaması"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">Sıra</label>
+                                        <div class="col-lg-8">
+                                            <input type="number" name="DisplayOrder" class="form-control form-control-lg form-control-solid" value="0" />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-4 col-form-label fw-semibold fs-6"></label>
+                                        <div class="col-lg-8">
+                                            <div class="form-check form-check-custom form-check-solid">
+                                                <input class="form-check-input" type="checkbox" name="IsActive" value="true" checked />
+                                                <label class="form-check-label">Aktif</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="reset" data-bs-dismiss="modal" class="btn btn-light me-3">Geri</button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <span class="indicator-label">Ekle</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

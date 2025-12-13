@@ -1,0 +1,128 @@
+@model IEnumerable<ECommerceApp.Models.ReturnRequest>
+
+@{
+    ViewData["Title"] = "İade Taleplerim";
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+}
+
+<div class="ps-page--my-account bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <partial name="_ProfileSidebar" />
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                        <h3 class="mb-0 fw-bold text-dark">İade Taleplerim</h3>
+                        <p class="text-muted small mt-1 mb-0">İade ve iptal taleplerinizin durumunu buradan takip edebilirsiniz.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (Model != null && Model.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="bg-light text-muted small text-uppercase">
+                                        <tr>
+                                            <th class="py-3 ps-4 rounded-start">Ürün</th>
+                                            <th class="py-3">Talep Tarihi</th>
+                                            <th class="py-3">Neden</th>
+                                            <th class="py-3">Durum</th>
+                                            <th class="py-3 pe-4 rounded-end text-end">Sipariş</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="border-0">
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-3">
+                                                            <div class="bg-light rounded p-2 text-center text-muted" style="width: 48px; height: 48px;">
+                                                                <i class="icon-bag2 fs-5"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="mb-0 text-dark fw-bold small">@item.OrderItem.ProductName</h6>
+                                                            <small class="text-muted">Adet: @item.OrderItem.Quantity</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-muted small">@item.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                                <td class="text-muted small">
+                                                    <span data-bs-toggle="tooltip" title="@item.Reason">
+                                                        @(item.Reason.Length > 20 ? item.Reason.Substring(0, 20) + "..." : item.Reason)
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if (item.Status == ECommerceApp.Models.ReturnRequestStatus.Pending)
+                                                    {
+                                                        <span class="badge bg-soft-warning text-warning rounded-pill px-3">Beklemede</span>
+                                                    }
+                                                    else if (item.Status == ECommerceApp.Models.ReturnRequestStatus.Approved)
+                                                    {
+                                                        <span class="badge bg-soft-success text-success rounded-pill px-3">Onaylandı</span>
+                                                    }
+                                                    else if (item.Status == ECommerceApp.Models.ReturnRequestStatus.Rejected)
+                                                    {
+                                                        <span class="badge bg-soft-danger text-danger rounded-pill px-3">Reddedildi</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-soft-secondary text-secondary rounded-pill px-3">İptal Edildi</span>
+                                                    }
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <a asp-action="OrderDetail" asp-route-id="@item.OrderId" class="btn btn-light btn-sm rounded-circle shadow-sm text-primary" data-bs-toggle="tooltip" title="Siparişi Görüntüle">
+                                                        <i class="icon-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (totalPages > 1)
+                            {
+                                <div class="d-flex justify-content-center mt-4">
+                                    <ul class="pagination">
+                                        @if (currentPage > 1)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-action="ReturnRequests" asp-route-page="@(currentPage - 1)">«</a>
+                                            </li>
+                                        }
+
+                                        @for (int i = 1; i <= totalPages; i++)
+                                        {
+                                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                                <a class="page-link" asp-action="ReturnRequests" asp-route-page="@i">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (currentPage < totalPages)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-action="ReturnRequests" asp-route-page="@(currentPage + 1)">»</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 bg-light rounded-3 border border-dashed">
+                                <i class="icon-refresh fs-1 text-muted mb-3 opacity-50"></i>
+                                <p class="text-muted mb-0">Henüz bir iade talebiniz bulunmamaktadır.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

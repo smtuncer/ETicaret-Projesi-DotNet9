@@ -1,0 +1,325 @@
+﻿@using System
+@model ContactPageViewModel
+
+@{
+    var info = Model.ContactInfo;
+    string defaultMapUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14049.340485982573!2d-0.12031301106485542!3d51.50228117351734!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487604ce176ac979%3A0x42af85654e23a0b4!2sThe%20National%20Gallery!5e0!3m2!1sen!2s!4v1582441665587!5m2!1sen!2s";
+    bool hasEmbed = !string.IsNullOrWhiteSpace(info.ContactGoogleMap) && info.ContactGoogleMap.Contains("<iframe", StringComparison.OrdinalIgnoreCase);
+    string mapSrc = hasEmbed
+        ? string.Empty
+        : (string.IsNullOrWhiteSpace(info.ContactGoogleMap) ? defaultMapUrl : info.ContactGoogleMap);
+    string? whatsappNumber = string.IsNullOrWhiteSpace(info.WhatsappButtonPhoneNumber)
+        ? null
+        : info.WhatsappButtonPhoneNumber
+            .Replace(" ", string.Empty, StringComparison.Ordinal)
+            .Replace("+", string.Empty, StringComparison.Ordinal);
+}
+
+<div class="ps-page--single ps-contact-page bg-light" id="contact-us">
+    <div class="container">
+        <div class="ps-contact-hero text-center mb-5">
+            <span class="badge bg-brand text-white mb-3 px-3 py-2 rounded-pill text-uppercase ls-1">Bize Ulaşın</span>
+            <h1 class="display-4 fw-bold text-dark mb-3">Size Nasıl Yardımcı Olabiliriz?</h1>
+            @if (!string.IsNullOrWhiteSpace(info.ContactText))
+            {
+                <p class="lead text-muted mx-auto" style="max-width: 700px;">@info.ContactText</p>
+            }
+        </div>
+        
+        <div class="row gy-5 align-items-start">
+            <!-- Sol Taraf: İletişim Bilgileri -->
+            <div class="col-lg-4">
+                <div class="card contact-info-card border-0 h-100">
+                    <div class="card-body p-4 p-lg-5">
+                        <h3 class="card-title h4 fw-bold mb-4 text-dark">İletişim Bilgileri</h3>
+                        <p class="text-muted mb-5 small">Her türlü soru, görüş ve önerileriniz için bize aşağıdaki kanallardan ulaşabilirsiniz.</p>
+                        
+                        <ul class="list-unstyled contact-details-list">
+                            @if (!string.IsNullOrWhiteSpace(info.ContactPhoneNumber))
+                            {
+                                <li class="d-flex align-items-center mb-4">
+                                    <div class="icon-box bg-soft-primary text-primary rounded-circle me-3 flex-shrink-0">
+                                        <i class="icon-phone"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block text-uppercase text-muted small fw-bold ls-1">Telefon</span>
+                                        <a href="tel:@info.ContactPhoneNumber" class="text-dark fw-semibold text-decoration-none fs-6">@info.ContactPhoneNumber</a>
+                                    </div>
+                                </li>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(info.ContactEmail))
+                            {
+                                <li class="d-flex align-items-center mb-4">
+                                    <div class="icon-box bg-soft-primary text-primary rounded-circle me-3 flex-shrink-0">
+                                        <i class="icon-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block text-uppercase text-muted small fw-bold ls-1">E-posta</span>
+                                        <a href="mailto:@info.ContactEmail" class="text-dark fw-semibold text-decoration-none fs-6">@info.ContactEmail</a>
+                                    </div>
+                                </li>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(info.ContactAddress))
+                            {
+                                <li class="d-flex align-items-start mb-4">
+                                    <div class="icon-box bg-soft-primary text-primary rounded-circle me-3 flex-shrink-0">
+                                        <i class="icon-map-marker"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block text-uppercase text-muted small fw-bold ls-1">Adres</span>
+                                        <span class="text-dark fw-medium">@info.ContactAddress</span>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+
+                        @if (!string.IsNullOrWhiteSpace(info.WhatsappButtonPhoneNumber) && !string.IsNullOrWhiteSpace(whatsappNumber))
+                        {
+                            <hr class="my-4 border-light">
+                            <a class="btn btn-whatsapp w-100 d-flex align-items-center justify-content-center gap-2 py-3 rounded-pill fw-bold text-white mb-4" href="https://wa.me/@whatsappNumber" target="_blank" rel="noopener">
+                                <i class="fab fa-whatsapp fs-5"></i>
+                                <span>@(string.IsNullOrWhiteSpace(info.WhatsappButtonText) ? "WhatsApp Hattı" : info.WhatsappButtonText)</span>
+                            </a>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(info.FacebookURL) ||
+                             !string.IsNullOrWhiteSpace(info.InstagramURL) ||
+                             !string.IsNullOrWhiteSpace(info.TwitterURL) ||
+                             !string.IsNullOrWhiteSpace(info.YoutubeURL) ||
+                             !string.IsNullOrWhiteSpace(info.LinkedinURL))
+                        {
+                            <div class="social-section mt-auto">
+                                <h6 class="text-uppercase text-muted small fw-bold ls-1 mb-3">Bizi Takip Edin</h6>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    @if (!string.IsNullOrWhiteSpace(info.FacebookURL))
+                                    {
+                                        <a class="social-btn facebook" href="@info.FacebookURL" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(info.TwitterURL))
+                                    {
+                                        <a class="social-btn twitter" href="@info.TwitterURL" target="_blank" rel="noopener" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(info.InstagramURL))
+                                    {
+                                        <a class="social-btn instagram" href="@info.InstagramURL" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(info.YoutubeURL))
+                                    {
+                                        <a class="social-btn youtube" href="@info.YoutubeURL" target="_blank" rel="noopener" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(info.LinkedinURL))
+                                    {
+                                        <a class="social-btn linkedin" href="@info.LinkedinURL" target="_blank" rel="noopener" aria-label="Linkedin"><i class="fab fa-linkedin"></i></a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Taraf: İletişim Formu -->
+            <div class="col-lg-8">
+                <div class="card contact-form-card border-0 h-100">
+                    <div class="card-body p-4 p-lg-5">
+                        <h3 class="card-title h4 fw-bold mb-2 text-dark">Mesaj Gönderin</h3>
+                        <p class="text-muted mb-4">Aşağıdaki formu doldurarak bize hızlıca ulaşabilirsiniz.</p>
+                        
+                        <form class="ps-form--contact-us needs-validation" asp-action="Contact" method="post" novalidate>
+                            @Html.AntiForgeryToken()
+
+                            @if (Model.IsSuccess && !string.IsNullOrWhiteSpace(Model.SuccessMessage))
+                            {
+                                <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+                                    <i class="icon-checkmark-circle fs-4 me-2"></i>
+                                    <div>@Model.SuccessMessage</div>
+                                </div>
+                            }
+                            
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control border-light bg-light ps-4" asp-for="Form.Name" id="floatingName" placeholder="Adınız Soyadınız">
+                                        <label for="floatingName" class="ps-4 text-muted">Adınız Soyadınız</label>
+                                        <span asp-validation-for="Form.Name" class="text-danger small mt-1 d-block ps-1"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control border-light bg-light ps-4" asp-for="Form.Email" id="floatingEmail" placeholder="name@example.com">
+                                        <label for="floatingEmail" class="ps-4 text-muted">E-posta Adresi</label>
+                                        <span asp-validation-for="Form.Email" class="text-danger small mt-1 d-block ps-1"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control border-light bg-light ps-4" asp-for="Form.Subject" id="floatingSubject" placeholder="Konu">
+                                        <label for="floatingSubject" class="ps-4 text-muted">Konu</label>
+                                        <span asp-validation-for="Form.Subject" class="text-danger small mt-1 d-block ps-1"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea class="form-control border-light bg-light ps-4 pt-4" asp-for="Form.Message" id="floatingMessage" placeholder="Mesajınız" style="height: 180px"></textarea>
+                                        <label for="floatingMessage" class="ps-4 text-muted">Mesajınız</label>
+                                        <span asp-validation-for="Form.Message" class="text-danger small mt-1 d-block ps-1"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-2 text-end">
+                                <button class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow-sm lift-effect" type="submit">
+                                    Gönder <i class="icon-paper-plane ms-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Harita Alanı -->
+        <div class="card border-0 shadow-sm mt-5 overflow-hidden rounded-4">
+            <div class="card-body p-0">
+                <div class="map-container">
+                    @if (hasEmbed)
+                    {
+                        @Html.Raw(info.ContactGoogleMap)
+                    }
+                    else
+                    {
+                        <iframe src="@mapSrc" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Sayfa Geneli */
+    .ps-contact-page {
+        background-color: #f9f9f9; /* Açık gri arka plan */
+        padding: 30px 0 30px;
+        font-family: 'Work Sans', sans-serif;
+    }
+
+    /* Hero Bölümü */
+    .bg-brand {
+        background-color: #C5A059; /* Tema rengi */
+    }
+    .ls-1 { letter-spacing: 1px; }
+    
+    /* Kartlar */
+    .contact-info-card, .contact-form-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .contact-info-card:hover, .contact-form-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+
+    /* İkonlar */
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background-color: rgba(252, 184, 0, 0.1); /* Tema rengi opaklığı */
+        color: #C5A059;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-details-list li:hover .icon-box {
+        background-color: #C5A059;
+        color: #fff;
+        transform: rotateY(180deg);
+    }
+
+    /* Sosyal Medya */
+    .social-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #555;
+        background: #f1f1f1;
+        transition: all 0.3s ease;
+        font-size: 16px;
+    }
+    .social-btn:hover { color: #fff; transform: translateY(-3px); }
+    .social-btn.facebook:hover { background: #3b5998; }
+    .social-btn.twitter:hover { background: #1da1f2; }
+    .social-btn.instagram:hover { background: #E1306C; }
+    .social-btn.youtube:hover { background: #ff0000; }
+    .social-btn.linkedin:hover { background: #0077b5; }
+
+    /* Form */
+    .form-floating > .form-control {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        height: 60px;
+        padding-top: 25px !important;
+        padding-bottom: 5px !important;
+        line-height: normal;
+    }
+    .form-floating > textarea.form-control {
+        height: 180px !important;
+        padding-top: 25px !important;
+    }
+    .form-floating > label {
+        padding-top: 10px;
+        padding-left: 25px !important;
+    }
+    .form-floating > .form-control:focus {
+        border-color: #C5A059;
+        box-shadow: 0 0 0 0.25rem rgba(252, 184, 0, 0.15);
+        background-color: #fff;
+    }
+    
+    .lift-effect {
+        transition: transform 0.2s ease;
+    }
+    .lift-effect:active {
+        transform: scale(0.98);
+    }
+
+    /* Whatsapp Button */
+    .btn-whatsapp {
+        background-color: #25D366;
+        transition: all 0.3s ease;
+    }
+    .btn-whatsapp:hover {
+        background-color: #128C7E;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+    }
+    
+    /* Primary Button Override */
+    .btn-primary {
+        background-color: #C5A059;
+        border-color: #C5A059;
+        color: #222;
+    }
+    .btn-primary:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #000;
+    }
+
+    /* Harita */
+    .map-container iframe {
+        display: block;
+        min-height: 450px;
+    }
+</style>

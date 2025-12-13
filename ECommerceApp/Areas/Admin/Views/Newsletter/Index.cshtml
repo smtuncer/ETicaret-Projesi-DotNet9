@@ -1,0 +1,143 @@
+@{
+    ViewData["Title"] = "Toplu Mail / Duyuru Gönder";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Duyuru Yönetimi</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-dark">Toplu Mail Gönder</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <h3>Yeni Duyuru Oluştur</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Send" method="post" id="newsletterForm">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="mb-5">
+                                <label class="form-label required">Konu</label>
+                                <input type="text" name="subject" class="form-control" placeholder="E-posta Konusu" required />
+                            </div>
+
+                            <div class="mb-5">
+                                <label class="form-label required">İçerik</label>
+                                <textarea name="content" id="kt_docs_ckeditor_classic" class="form-control" rows="10" placeholder="E-posta içeriği..."></textarea>
+                                <div class="text-muted fs-7 mt-2">İçeriğinizi HTML formatında veya düz metin olarak hazırlayabilirsiniz. Sistem otomatik olarak şablona giydirecektir.</div>
+                            </div>
+
+                            <div class="separator my-10"></div>
+
+                            <div class="row mb-5">
+                                <div class="col-md-6">
+                                    <div class="mb-5">
+                                        <label class="form-label fw-bold">Test Gönderimi</label>
+                                        <div class="input-group">
+                                            <input type="email" name="testEmail" class="form-control" placeholder="Test için e-posta adresi (Opsiyonel)" />
+                                            <button type="button" class="btn btn-secondary" onclick="submitTest()">Test Et</button>
+                                        </div>
+                                        <div class="form-text">Önce test maili göndererek şablonu kontrol etmeniz önerilir.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-5">
+                                        <label class="form-label fw-bold">Kitle</label>
+                                        <div class="form-check form-check-custom form-check-solid">
+                                            <input class="form-check-input" type="checkbox" name="sendToAll" value="true" id="sendToAllCheck" />
+                                            <label class="form-check-label" for="sendToAllCheck">
+                                                Tüm Aktif Kullanıcılara Gönder
+                                            </label>
+                                        </div>
+                                        <div class="alert alert-warning mt-3 d-none" id="warningAlert">
+                                            <i class="ki-duotone ki-information-5 fs-2hx text-warning me-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                            <div class="d-flex flex-column">
+                                                <h4 class="mb-1 text-warning">Dikkat</h4>
+                                                <span>Bu işlem tüm kayıtlı kullanıcılara e-posta gönderecektir. Bu işlem geri alınamaz.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <span class="indicator-label">Gönder</span>
+                                    <span class="indicator-progress">Lütfen bekleyin... <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/metronic/assets/plugins/custom/ckeditor/ckeditor-classic.bundle.js"></script>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#kt_docs_ckeditor_classic'))
+            .then(editor => {
+                console.log(editor);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        // Show warning when 'Send to All' is checked
+        $('#sendToAllCheck').change(function() {
+            if(this.checked) {
+                $('#warningAlert').removeClass('d-none');
+                $('#submitBtn').addClass('btn-danger').removeClass('btn-primary');
+            } else {
+                $('#warningAlert').addClass('d-none');
+                $('#submitBtn').addClass('btn-primary').removeClass('btn-danger');
+            }
+        });
+
+        // Handle Test Submit separately? Or just use same form.
+        // Simple approach: user fills form, enters test email, clicks "Test Et".
+        // We can just submit the form but maybe ensure sendToAll is false via JS if testing?
+        // Or cleaner: The controller handles priority. If testEmail is present, it sends test. 
+        // If sendToAll is ALSO present, it sends both.
+        // Let's keep it simple.
+        
+        function submitTest() {
+            var email = $('input[name="testEmail"]').val();
+            if(!email) {
+                alert('Lütfen test e-posta adresi girin.');
+                return;
+            }
+            // Temporarily uncheck send to all just in case
+            var originalCheck = $('#sendToAllCheck').is(':checked');
+            $('#sendToAllCheck').prop('checked', false);
+            
+            $('#newsletterForm').submit();
+            
+            // Restore check (though page will reload usually)
+            setTimeout(function() {
+                $('#sendToAllCheck').prop('checked', originalCheck);
+            }, 100);
+        }
+    </script>
+}

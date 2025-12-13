@@ -1,0 +1,335 @@
+@model IEnumerable<ECommerceApp.Models.Address>
+
+@{
+    ViewData["Title"] = "Adreslerim";
+}
+
+<div class="ps-page--my-account bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <partial name="_ProfileSidebar" />
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0 fw-bold text-dark">Adres Listesi</h3>
+                            <p class="text-muted small mt-1 mb-0">Kayıtlı adreslerinizi yönetin.</p>
+                        </div>
+                        <button class="btn btn-outline-primary rounded-pill btn-sm fw-bold" onclick="document.getElementById('new-address-form').scrollIntoView({behavior: 'smooth'})">
+                            <i class="icon-plus me-1"></i> Yeni Ekle
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success border-0 shadow-sm mb-4">
+                                <i class="icon-checkmark-circle me-2"></i> @TempData["SuccessMessage"]
+                            </div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                                <i class="icon-warning me-2"></i> @TempData["ErrorMessage"]
+                            </div>
+                        }
+
+                        <div class="row g-3">
+                            @foreach (var address in Model)
+                            {
+                                <div class="col-md-6">
+                                    <div class="card h-100 address-card border-light shadow-sm rounded-3">
+                                        <div class="card-body position-relative">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="icon-box bg-soft-primary text-primary rounded-circle me-3">
+                                                    <i class="icon-map-marker"></i>
+                                                </div>
+                                                <div>
+                                                    <h5 class="card-title fw-bold mb-0 text-dark">@address.Title</h5>
+                                                    @if (address.IsBillingAddress)
+                                                    {
+                                                        <span class="badge bg-warning text-dark small mt-1">Fatura Adresi</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                @if (!string.IsNullOrEmpty(address.FullName))
+                                                {
+                                                    <p class="mb-1 small"><i class="icon-user me-2 text-muted"></i><strong>@address.FullName</strong></p>
+                                                }
+                                                @if (!string.IsNullOrEmpty(address.Phone))
+                                                {
+                                                    <p class="mb-1 small"><i class="icon-telephone me-2 text-muted"></i>@address.Phone</p>
+                                                }
+                                            </div>
+
+                                            <p class="text-muted mb-3 small">
+                                                <i class="icon-location me-2"></i>
+                                                <span class="d-block ms-4">
+                                                    @address.OpenAddress<br>
+                                                    @address.District / @address.City<br>
+                                                    @if (!string.IsNullOrEmpty(address.Country))
+                                                    {
+                                                        <span>@address.Country</span>
+                                                        if (!string.IsNullOrEmpty(address.ZipCode))
+                                                        {
+                                                            <span> - @address.ZipCode</span>
+                                                        }
+                                                    }
+                                                </span>
+                                            </p>
+
+                                            @if (address.IsBillingAddress)
+                                            {
+                                                <div class="border-top pt-2 mt-2">
+                                                    <p class="small text-muted mb-1"><strong>Fatura Bilgileri:</strong></p>
+                                                    @if (!string.IsNullOrEmpty(address.CompanyName))
+                                                    {
+                                                        <p class="small mb-1"><i class="icon-briefcase me-2"></i>@address.CompanyName</p>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(address.TaxOffice) && !string.IsNullOrEmpty(address.TaxNumber))
+                                                    {
+                                                        <p class="small mb-1"><i class="icon-file-text me-2"></i>@address.TaxOffice - @address.TaxNumber</p>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(address.IdentityNumber))
+                                                    {
+                                                        <p class="small mb-1"><i class="icon-credit-card me-2"></i>TC: @address.IdentityNumber</p>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(address.BillingAddress))
+                                                    {
+                                                         <p class="small mb-1"><i class="icon-map-marker me-2"></i>Fatura Adresi: @address.BillingAddress</p>
+                                                    }
+                                                </div>
+                                            }
+
+                                            <div class="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                                                <a href="@Url.Action("EditAddress", new { id = address.Id })" class="btn btn-light btn-sm text-primary rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Düzenle">
+                                                    <i class="icon-pencil"></i>
+                                                </a>
+                                                <form asp-action="DeleteAddress" method="post" class="d-inline" onsubmit="return confirm('Bu adresi silmek istediğinize emin misiniz?');">
+                                                    <input type="hidden" name="id" value="@address.Id" />
+                                                    <button type="submit" class="btn btn-light btn-sm text-danger rounded-circle shadow-sm" data-bs-toggle="tooltip" title="Sil">
+                                                        <i class="icon-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (!Model.Any())
+                            {
+                                <div class="col-12">
+                                    <div class="text-center py-5 bg-light rounded-3 border border-dashed">
+                                        <i class="icon-map-marker fs-1 text-muted mb-3 opacity-50"></i>
+                                        <p class="text-muted mb-0">Henüz kayıtlı adresiniz bulunmuyor.</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3" id="new-address-form">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                        <h4 class="mb-0 fw-bold text-dark">Yeni Adres Ekle</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-action="AddAddress" method="post">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" name="Title" id="floatingTitle" placeholder="Ev, İş vb." required />
+                                        <label for="floatingTitle" class="text-muted">Adres Başlığı (Örn: Ev)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" name="FullName" id="floatingFullName" placeholder="Ad Soyad" required />
+                                        <label for="floatingFullName" class="text-muted">Ad Soyad</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="tel" name="Phone" id="floatingPhone" placeholder="Telefon" required />
+                                        <label for="floatingPhone" class="text-muted">Telefon</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" name="Country" id="floatingCountry" placeholder="Ülke" value="Türkiye" required />
+                                        <label for="floatingCountry" class="text-muted">Ülke</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" name="City" id="floatingCity" placeholder="Şehir" required />
+                                        <label for="floatingCity" class="text-muted">Şehir</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" name="District" id="floatingDistrict" placeholder="İlçe" required />
+                                        <label for="floatingDistrict" class="text-muted">İlçe</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" name="ZipCode" id="floatingZip" placeholder="Posta Kodu" />
+                                        <label for="floatingZip" class="text-muted">Posta Kodu</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" name="OpenAddress" id="floatingAddress" rows="3" placeholder="Açık Adres" style="height: 100px" required></textarea>
+                                        <label for="floatingAddress" class="text-muted">Açık Adres</label>
+                                    </div>
+                                </div>
+
+                                <!-- Fatura Adresi Checkbox -->
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="IsBillingAddress" id="isBillingAddress" onchange="toggleBillingFields()">
+                                        <label class="form-check-label fw-bold" for="isBillingAddress">
+                                            Bu adres fatura adresi olarak kullanılacak
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Fatura Bilgileri (Conditional) -->
+                                <div id="billingFields" style="display: none;" class="col-12">
+                                    <div class="card bg-light border-0 mt-2">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3">Fatura Bilgileri</h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input class="form-control" type="text" name="IdentityNumber" id="floatingIdentityNumber" placeholder="TC Kimlik No" maxlength="11" />
+                                                        <label for="floatingIdentityNumber" class="text-muted">TC Kimlik No</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input class="form-control" type="text" name="CompanyName" id="floatingCompanyName" placeholder="Şirket Adı (Opsiyonel)" />
+                                                        <label for="floatingCompanyName" class="text-muted">Şirket Adı (Kurumsal için)</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input class="form-control" type="text" name="TaxOffice" id="floatingTaxOffice" placeholder="Vergi Dairesi" />
+                                                        <label for="floatingTaxOffice" class="text-muted">Vergi Dairesi</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input class="form-control" type="text" name="TaxNumber" id="floatingTaxNumber" placeholder="Vergi No" />
+                                                        <label for="floatingTaxNumber" class="text-muted">Vergi No</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating">
+                                                        <textarea class="form-control" name="BillingAddress" id="floatingBillingAddress" rows="2" placeholder="Fatura Adresi" style="height: 80px"></textarea>
+                                                        <label for="floatingBillingAddress" class="text-muted">Fatura Adresi (Teslimat adresinden farklıysa)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 d-flex justify-content-end">
+                                <button class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow-sm">Adresi Kaydet</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleBillingFields() {
+        const checkbox = document.getElementById('isBillingAddress');
+        const billingFields = document.getElementById('billingFields');
+        
+        if (checkbox.checked) {
+            billingFields.style.display = 'block';
+        } else {
+            billingFields.style.display = 'none';
+        }
+    }
+</script>
+
+<style>
+    .form-floating > .form-control {
+        border: 1px solid #eee;
+        border-radius: 10px;
+    }
+    .form-floating > .form-control:focus {
+        border-color: #C5A059;
+        box-shadow: 0 0 0 0.25rem rgba(252, 184, 0, 0.15);
+    }
+    
+    .address-card {
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+    }
+    .address-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+        border-color: #C5A059;
+    }
+    
+    .icon-box {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    .bg-soft-primary {
+        background-color: rgba(252, 184, 0, 0.1);
+        color: #C5A059 !important;
+    }
+    .text-primary {
+        color: #C5A059 !important;
+    }
+    .btn-outline-primary {
+        color: #C5A059;
+        border-color: #C5A059;
+    }
+    .btn-outline-primary:hover {
+        background-color: #C5A059;
+        color: #222;
+    }
+    
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    /* Form-floating fixes */
+    .form-floating > .form-control {
+        height: 58px;
+        line-height: 1.25;
+    }
+
+    .form-floating > label {
+        padding: 1rem 0.75rem;
+    }
+
+    .form-floating > .form-control:focus,
+    .form-floating > .form-control:not(:placeholder-shown) {
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        opacity: 0.65;
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+</style>

@@ -1,0 +1,13 @@
+@model ECommerceApp.Models.SeoSetting
+
+<title>@Model.Title</title>
+<meta name="description" content="@Model.Description" />
+<meta name="keywords" content="@Model.Keywords" />
+<link rel="icon" type="image/x-icon" href="~/favicon.jpg">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="@Context.Request.Scheme://@Context.Request.Host@Model.UrlPath" />
+<meta property="og:title" content="@Model.Title" />
+<meta property="og:description" content="@Model.Description" />
+

@@ -1,0 +1,498 @@
+@model ECommerceApp.Areas.User.ViewModels.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Ödeme";
+}
+
+<div class="ps-page--simple">
+    <div class="ps-checkout ps-section--shopping">
+        <div class="container">
+            <div class="ps-section__header">
+                <h1>Ödeme</h1>
+            </div>
+            <div class="ps-section__content">
+                <form asp-action="SubmitOrder" method="post" class="ps-form--checkout">
+                    <div class="row">
+                        <div class="col-xl-7 col-lg-8 col-md-12 col-sm-12">
+                                <div class="ps-form__billing-info">
+                                    <h3 class="ps-form__heading">Teslimat Adresi</h3>
+
+                                    @if (Model.UserAddresses != null && Model.UserAddresses.Any())
+                                    {
+                                        <div class="form-group mb-4">
+                                            <label class="h5 mb-3">Teslimat Adresi Seçin</label>
+                                            <div class="row">
+                                                @foreach (var address in Model.UserAddresses)
+                                                {
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="ps-radio p-3 border rounded h-100 d-flex align-items-center @(address.Id == Model.UserAddresses.First().Id ? "border-primary bg-light" : "")" id="card-address-@address.Id">
+                                                            <input class="form-control me-2" type="radio" id="address-@address.Id" name="SelectedAddressId" value="@address.Id" @(address.Id == Model.UserAddresses.First().Id ? "checked" : "") onchange="toggleNewAddress(false); highlightSelectedAddress(this)">
+                                                            <label for="address-@address.Id" class="mb-0 w-100 cursor-pointer">
+                                                                <strong class="d-block text-dark">@address.Title</strong>
+                                                                <span class="text-muted small">@address.City, @address.District</span>
+                                                                <br>
+                                                                <span class="text-muted small">@address.OpenAddress</span>
+                                                                
+                                                                @if (address.IsBillingAddress)
+                                                                {
+                                                                    <div class="mt-2 pt-2 border-top small text-muted">
+                                                                        <strong class="d-block text-primary mb-1"><i class="icon-receipt me-1"></i> Fatura Bilgileri</strong>
+                                                                        @if (!string.IsNullOrEmpty(address.CompanyName))
+                                                                        {
+                                                                            <div><strong>Şirket:</strong> @address.CompanyName</div>
+                                                                            <div><strong>V.D.:</strong> @address.TaxOffice - <strong>V.No:</strong> @address.TaxNumber</div>
+                                                                        }
+                                                                        else if (!string.IsNullOrEmpty(address.IdentityNumber))
+                                                                        {
+                                                                             <div><strong>TCKN:</strong> @address.IdentityNumber</div>
+                                                                        }
+                                                                    </div>
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="ps-radio p-3 border rounded h-100 d-flex align-items-center" id="card-address-new">
+                                                        <input class="form-control me-2" type="radio" id="address-new" name="SelectedAddressId" value="0" onchange="toggleNewAddress(true); highlightSelectedAddress(this)">
+                                                        <label for="address-new" class="mb-0 w-100 cursor-pointer">
+                                                            <strong class="d-block text-primary"><i class="icon-plus me-1"></i> Yeni Adres Ekle</strong>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" name="SelectedAddressId" value="0" />
+                                        <script>
+                                            document.addEventListener("DOMContentLoaded", function() {
+                                                toggleNewAddress(true);
+                                            });
+                                        </script>
+                                    }
+
+                                    <div id="new-address-form" class="ps-block--new-address p-4 border rounded bg-light mt-4" style="@(Model.UserAddresses != null && Model.UserAddresses.Any() ? "display:none;" : "")">
+                                        <h4 class="mb-4 border-bottom pb-2">Yeni Adres Oluştur</h4>
+                                        <input type="hidden" asp-for="UseNewAddress" id="UseNewAddress" value="@(Model.UserAddresses == null || !Model.UserAddresses.Any() ? "true" : "false")" />
+                                        
+                                        <div class="form-group">
+                                            <label>Adres Başlığı <sup class="text-danger">*</sup></label>
+                                            <input asp-for="NewAddress.Title" class="form-control" type="text" placeholder="Örn: Evim, İşyerim">
+                                            <span asp-validation-for="NewAddress.Title" class="text-danger"></span>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label>Ad Soyad <sup class="text-danger">*</sup></label>
+                                                    <input asp-for="NewAddress.FullName" class="form-control" type="text">
+                                                    <span asp-validation-for="NewAddress.FullName" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label>Telefon <sup class="text-danger">*</sup></label>
+                                                    <input asp-for="NewAddress.Phone" class="form-control" type="tel">
+                                                    <span asp-validation-for="NewAddress.Phone" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label>İl <sup class="text-danger">*</sup></label>
+                                                    <input asp-for="NewAddress.City" class="form-control" type="text">
+                                                    <span asp-validation-for="NewAddress.City" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label>İlçe <sup class="text-danger">*</sup></label>
+                                                    <input asp-for="NewAddress.District" class="form-control" type="text">
+                                                    <span asp-validation-for="NewAddress.District" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Açık Adres <sup class="text-danger">*</sup></label>
+                                            <textarea asp-for="NewAddress.OpenAddress" class="form-control" rows="3" placeholder="Mahalle, sokak, kapı no vb."></textarea>
+                                            <span asp-validation-for="NewAddress.OpenAddress" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Posta Kodu</label>
+                                            <input asp-for="NewAddress.ZipCode" class="form-control" type="text">
+                                        </div>
+
+                                        <!-- Fatura Adresi Checkbox -->
+                                        <div class="form-group mt-4">
+                                            <div class="ps-checkbox">
+                                                <input asp-for="NewAddress.IsBillingAddress" class="form-control" type="checkbox" id="isBillingAddress" onchange="toggleBillingFields()">
+                                                <label for="isBillingAddress" class="fw-bold text-dark">Kurumsal Fatura İstiyorum / Fatura Bilgilerimi Gireceğim</label>
+                                            </div>
+                                            <small class="text-muted ms-4 d-block">İşaretlemezseniz fatura bireysel olarak adınıza kesilecektir.</small>
+                                        </div>
+
+                                        <!-- Fatura Bilgileri (Conditional) -->
+                                        <div id="billingFields" class="ps-block--billing-details p-3 bg-white border rounded mt-3" style="display: none;">
+                                            <h5 class="mb-3 text-primary">Fatura Detayları</h5>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>TC Kimlik No</label>
+                                                        <input asp-for="NewAddress.IdentityNumber" class="form-control" type="text" maxlength="11">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>Şirket Adı (Kurumsal için)</label>
+                                                        <input asp-for="NewAddress.CompanyName" class="form-control" type="text">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>Vergi Dairesi</label>
+                                                        <input asp-for="NewAddress.TaxOffice" class="form-control" type="text">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>Vergi No</label>
+                                                        <input asp-for="NewAddress.TaxNumber" class="form-control" type="text">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Fatura Adresi (Teslimat adresinden farklıysa)</label>
+                                                <textarea asp-for="NewAddress.BillingAddress" class="form-control" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Billing Address Section -->
+                                <div class="ps-form__billing-info mt-5">
+                                    <h3 class="ps-form__heading">Fatura Adresi</h3>
+                                    <div class="form-group">
+                                        <div class="ps-checkbox">
+                                            <input class="form-control" type="checkbox" id="same-address" checked onchange="toggleBillingAddressSection()">
+                                            <label for="same-address" class="fw-bold">Fatura adresim teslimat adresimle aynı</label>
+                                        </div>
+                                        <input type="hidden" asp-for="UseDifferentBillingAddress" id="UseDifferentBillingAddress" value="false" />
+                                    </div>
+
+                                    <div id="billing-address-section" style="display:none;">
+                                        @if (Model.UserAddresses != null && Model.UserAddresses.Any())
+                                        {
+                                            <div class="form-group mb-4">
+                                                <label class="h5 mb-3">Fatura Adresi Seçin</label>
+                                                <div class="row">
+                                                    @foreach (var address in Model.UserAddresses)
+                                                    {
+                                                        <div class="col-md-6 mb-3">
+                                                            <div class="ps-radio p-3 border rounded h-100 d-flex align-items-center" id="card-billing-address-@address.Id">
+                                                                <input class="form-control me-2" type="radio" id="billing-address-@address.Id" name="SelectedBillingAddressId" value="@address.Id" onchange="toggleNewBillingAddress(false); highlightSelectedBillingAddress(this)">
+                                                                <label for="billing-address-@address.Id" class="mb-0 w-100 cursor-pointer">
+                                                                    <strong class="d-block text-dark">@address.Title</strong>
+                                                                    <span class="text-muted small">@address.City, @address.District</span>
+                                                                    <br>
+                                                                    <span class="text-muted small">@address.OpenAddress</span>
+                                                                    @if (address.IsBillingAddress)
+                                                                    {
+                                                                         <div class="mt-2 pt-2 border-top small text-muted">
+                                                                            <strong class="d-block text-primary mb-1"><i class="icon-receipt me-1"></i> Fatura Bilgileri</strong>
+                                                                            @if (!string.IsNullOrEmpty(address.CompanyName))
+                                                                            {
+                                                                                <div><strong>Şirket:</strong> @address.CompanyName</div>
+                                                                                <div><strong>V.D.:</strong> @address.TaxOffice - <strong>V.No:</strong> @address.TaxNumber</div>
+                                                                            }
+                                                                            else if (!string.IsNullOrEmpty(address.IdentityNumber))
+                                                                            {
+                                                                                 <div><strong>TCKN:</strong> @address.IdentityNumber</div>
+                                                                            }
+                                                                        </div>
+                                                                    }
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="ps-radio p-3 border rounded h-100 d-flex align-items-center" id="card-billing-address-new">
+                                                            <input class="form-control me-2" type="radio" id="billing-address-new" name="SelectedBillingAddressId" value="0" onchange="toggleNewBillingAddress(true); highlightSelectedBillingAddress(this)">
+                                                            <label for="billing-address-new" class="mb-0 w-100 cursor-pointer">
+                                                                <strong class="d-block text-primary"><i class="icon-plus me-1"></i> Yeni Fatura Adresi Ekle</strong>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <input type="hidden" name="SelectedBillingAddressId" value="0" />
+                                            <script>
+                                                document.addEventListener("DOMContentLoaded", function() {
+                                                    toggleNewBillingAddress(true);
+                                                });
+                                            </script>
+                                        }
+
+                                        <div id="new-billing-address-form" class="ps-block--new-address p-4 border rounded bg-light mt-4" style="@(Model.UserAddresses != null && Model.UserAddresses.Any() ? "display:none;" : "")">
+                                            <h4 class="mb-4 border-bottom pb-2">Yeni Fatura Adresi Oluştur</h4>
+                                            <input type="hidden" asp-for="UseNewBillingAddress" id="UseNewBillingAddress" value="@(Model.UserAddresses == null || !Model.UserAddresses.Any() ? "true" : "false")" />
+                                            
+                                            <div class="form-group">
+                                                <label>Adres Başlığı <sup class="text-danger">*</sup></label>
+                                                <input asp-for="NewBillingAddress.Title" class="form-control" type="text" placeholder="Örn: Evim, İşyerim">
+                                                <span asp-validation-for="NewBillingAddress.Title" class="text-danger"></span>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>İl <sup class="text-danger">*</sup></label>
+                                                        <input asp-for="NewBillingAddress.City" class="form-control" type="text">
+                                                        <span asp-validation-for="NewBillingAddress.City" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label>İlçe <sup class="text-danger">*</sup></label>
+                                                        <input asp-for="NewBillingAddress.District" class="form-control" type="text">
+                                                        <span asp-validation-for="NewBillingAddress.District" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Açık Adres <sup class="text-danger">*</sup></label>
+                                                <textarea asp-for="NewBillingAddress.OpenAddress" class="form-control" rows="3" placeholder="Mahalle, sokak, kapı no vb."></textarea>
+                                                <span asp-validation-for="NewBillingAddress.OpenAddress" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Posta Kodu</label>
+                                                <input asp-for="NewBillingAddress.ZipCode" class="form-control" type="text">
+                                            </div>
+
+                                            <!-- Fatura Detayları -->
+                                            <div class="form-group mt-4">
+                                                <div class="ps-checkbox">
+                                                    <input asp-for="NewBillingAddress.IsBillingAddress" class="form-control" type="checkbox" id="isBillingAddressBilling" onchange="toggleBillingFields()" checked>
+                                                    <label for="isBillingAddressBilling" class="fw-bold text-dark">Fatura Bilgilerini Gir</label>
+                                                </div>
+                                            </div>
+
+                                            <div id="billingFieldsBilling" class="ps-block--billing-details p-3 bg-white border rounded mt-3" style="display: block;">
+                                                <h5 class="mb-3 text-primary">Fatura Detayları</h5>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Ad Soyad</label>
+                                                            <input asp-for="NewBillingAddress.FullName" class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Telefon</label>
+                                                            <input asp-for="NewBillingAddress.Phone" class="form-control" type="tel">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>TC Kimlik No</label>
+                                                            <input asp-for="NewBillingAddress.IdentityNumber" class="form-control" type="text" maxlength="11">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Şirket Adı (Kurumsal için)</label>
+                                                            <input asp-for="NewBillingAddress.CompanyName" class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Vergi Dairesi</label>
+                                                            <input asp-for="NewBillingAddress.TaxOffice" class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group">
+                                                            <label>Vergi No</label>
+                                                            <input asp-for="NewBillingAddress.TaxNumber" class="form-control" type="text">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Fatura Adresi (Teslimat adresinden farklıysa)</label>
+                                                    <textarea asp-for="NewBillingAddress.BillingAddress" class="form-control" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="col-xl-5 col-lg-4 col-md-12 col-sm-12">
+                            <div class="ps-form__total">
+                                <h3 class="ps-form__heading">Sipariş Özeti</h3>
+                                <div class="content">
+                                    <div class="ps-block--checkout-total">
+                                        <div class="ps-block__header">
+                                            <p>Ürün <span>Toplam</span></p>
+                                        </div>
+                                        <div class="ps-block__content">
+                                            <table class="table ps-block__products">
+                                                <tbody>
+                                                    @foreach (var item in Model.Cart.Items)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <a href="@Url.ProductUrl(item.Product.Id, item.Product.Name, item.Product.Slug)"> @item.Product.Name</a> x @item.Quantity
+                                                                <br />
+                                                                <small class="text-muted">+ %@item.VatRate.ToString("0") KDV (@item.VatAmount.ToString("N2") ₺)</small>
+                                                            </td>
+                                                            <td>@((item.Quantity * item.PriceWithVat).ToString("N2")) ₺</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                            <h4 class="ps-block__title">Ara Toplam (KDV Hariç) <span>@Model.Cart.SubTotal.ToString("N2") ₺</span></h4>
+                                            <h4 class="ps-block__title">Toplam KDV <span>+@Model.Cart.TotalVAT.ToString("N2") ₺</span></h4>
+                                            @if (Model.Cart.DiscountAmount > 0)
+                                            {
+                                                <h4 class="ps-block__title">İndirim <span>-@Model.Cart.DiscountAmount.ToString("N2") ₺</span></h4>
+                                            }
+                                            <h4 class="ps-block__title">Kargo <span>@(Model.Cart.ShippingCost == 0 ? "Ücretsiz" : "+" + Model.Cart.ShippingCost.ToString("N2") + " ₺")</span></h4>
+                                            <h3>Toplam <span>@Model.Cart.TotalAmount.ToString("N2") ₺</span></h3>
+                                        </div>
+                                    </div>
+                                    <div class="ps-block--payment-method">
+                                    @*     <div class="ps-radio">
+                                            <input class="form-control" type="radio" id="payment-credit-card" name="PaymentMethod" value="CreditCard" checked>
+                                            <label for="payment-credit-card">Kredi Kartı (PayTR)</label>
+                                        </div> *@
+                                         <div class="ps-radio">
+                                            <input class="form-control" type="radio" id="payment-credit-card-iyzico" name="PaymentMethod" value="CreditCardIyzico">
+                                            <label for="payment-credit-card-iyzico">Kredi Kartı (Iyzico)</label>
+                                        </div>
+                                        <div class="ps-radio">
+                                            <input class="form-control" type="radio" id="payment-transfer" name="PaymentMethod" value="BankTransfer">
+                                            <label for="payment-transfer">Havale / EFT</label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="ps-btn ps-btn--fullwidth">Siparişi Tamamla</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Shipping Address Scripts
+        function toggleNewAddress(show) {
+            var form = document.getElementById('new-address-form');
+            var useNewInput = document.getElementById('UseNewAddress');
+            if (show) {
+                form.style.display = 'block';
+                useNewInput.value = 'true';
+            } else {
+                form.style.display = 'none';
+                useNewInput.value = 'false';
+            }
+        }
+
+        function highlightSelectedAddress(radio) {
+            // Remove highlighting from all shipping address cards
+            document.querySelectorAll('input[name="SelectedAddressId"]').forEach(function(el) {
+                 var container = el.closest('.ps-radio');
+                 if(container) container.classList.remove('border-primary', 'bg-light');
+            });
+            
+            // Add highlighting to the parent container of the selected radio
+            var container = radio.closest('.ps-radio');
+            if (container) {
+                container.classList.add('border-primary', 'bg-light');
+            }
+        }
+        
+        // Billing Address Scripts
+        function toggleBillingAddressSection() {
+            var checkbox = document.getElementById('same-address');
+            var section = document.getElementById('billing-address-section');
+            var hiddenInput = document.getElementById('UseDifferentBillingAddress');
+            
+            if (checkbox.checked) {
+                section.style.display = 'none';
+                hiddenInput.value = 'false';
+            } else {
+                section.style.display = 'block';
+                hiddenInput.value = 'true';
+            }
+        }
+
+        function toggleNewBillingAddress(show) {
+            var form = document.getElementById('new-billing-address-form');
+            var useNewInput = document.getElementById('UseNewBillingAddress');
+            if (show) {
+                form.style.display = 'block';
+                useNewInput.value = 'true';
+            } else {
+                form.style.display = 'none';
+                useNewInput.value = 'false';
+            }
+        }
+
+        function highlightSelectedBillingAddress(radio) {
+             // Remove highlighting from all billing address cards
+            document.querySelectorAll('input[name="SelectedBillingAddressId"]').forEach(function(el) {
+                 var container = el.closest('.ps-radio');
+                 if(container) container.classList.remove('border-primary', 'bg-light');
+            });
+            
+            var container = radio.closest('.ps-radio');
+            if (container) {
+                container.classList.add('border-primary', 'bg-light');
+            }
+        }
+
+        function toggleBillingFields() {
+            const checkbox = document.getElementById('isBillingAddress');
+            const billingFields = document.getElementById('billingFields');
+            const checkboxBilling = document.getElementById('isBillingAddressBilling');
+            const billingFieldsBilling = document.getElementById('billingFieldsBilling');
+            
+            // For Shipping New Address Form
+            if (checkbox && billingFields) {
+                 if (checkbox.checked) {
+                    billingFields.style.display = 'block';
+                } else {
+                    billingFields.style.display = 'none';
+                }
+            }
+            
+            // For Billing New Address Form
+             if (checkboxBilling && billingFieldsBilling) {
+                 if (checkboxBilling.checked) {
+                    billingFieldsBilling.style.display = 'block';
+                } else {
+                    billingFieldsBilling.style.display = 'none';
+                }
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", function() {
+             var sameAddressCheckbox = document.getElementById('same-address');
+             if(sameAddressCheckbox) {
+                 toggleBillingAddressSection();
+             }
+        });
+    </script>
+}

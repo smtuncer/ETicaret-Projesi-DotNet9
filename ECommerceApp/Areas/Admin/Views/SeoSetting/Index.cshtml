@@ -1,0 +1,178 @@
+@model IEnumerable<ECommerceApp.Models.SeoSetting>
+
+@{
+    ViewData["Title"] = "SEO Yönetimi";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">SEO Yönetimi</h1>
+                </div>
+                <div class="card-toolbar">
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addSeoModal">
+                        <i class="ki-duotone ki-plus fs-2"></i>Yeni Sayfa SEO Ekle
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card mb-5 mb-xl-8">
+                    <div class="card-body py-3">
+                        <div class="table-responsive">
+                            <table class="table align-middle gs-0 gy-4">
+                                <thead>
+                                    <tr class="fw-bold text-muted bg-light">
+                                        <th class="ps-4 rounded-start">Sayfa Adı</th>
+                                        <th>URL Yolu</th>
+                                        <th>Meta Başlık</th>
+                                        <th>Son Güncelleme</th>
+                                        <th class="rounded-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <span class="text-gray-900 fw-bold fs-6">@item.PageName</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-light-info">@item.UrlPath</span>
+                                            </td>
+                                            <td>@item.Title</td>
+                                            <td>@item.UpdatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td class="text-end">
+                                                <button type="button" class="btn btn-success btn-sm px-4 me-2" data-bs-toggle="modal" data-bs-target="#editSeoModal-@item.Id">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm px-4" onclick="return confirm('Silmek istediğinize emin misiniz?')">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </a>
+
+                                                <!-- Edit Modal -->
+                                                <div class="modal fade" id="editSeoModal-@item.Id" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered mw-650px text-start">
+                                                        <div class="modal-content rounded">
+                                                            <div class="modal-header pb-0 border-0 justify-content-end">
+                                                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                                <form asp-action="Edit" method="post">
+                                                                    <input type="hidden" name="Id" value="@item.Id" />
+                                                                    <div class="mb-13 text-center">
+                                                                        <h1 class="mb-3">SEO Ayarını Düzenle</h1>
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span class="required">Sayfa Adı</span>
+                                                                        </label>
+                                                                        <input type="text" class="form-control form-control-solid" name="PageName" value="@item.PageName" required />
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span class="required">URL Yolu</span>
+                                                                        </label>
+                                                                        <input type="text" class="form-control form-control-solid" name="UrlPath" value="@item.UrlPath" required />
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span class="required">Meta Başlık</span>
+                                                                        </label>
+                                                                        <input type="text" class="form-control form-control-solid" name="Title" value="@item.Title" required maxlength="160" />
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span>Meta Açıklama</span>
+                                                                        </label>
+                                                                        <textarea class="form-control form-control-solid" name="Description" rows="3" maxlength="300">@item.Description</textarea>
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span>Anahtar Kelimeler</span>
+                                                                        </label>
+                                                                        <input type="text" class="form-control form-control-solid" name="Keywords" value="@item.Keywords" maxlength="200" />
+                                                                    </div>
+                                                                    <div class="text-center">
+                                                                        <button type="reset" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                                                                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addSeoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content rounded">
+            <div class="modal-header pb-0 border-0 justify-content-end">
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="ki-duotone ki-cross fs-1"></i>
+                </div>
+            </div>
+            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                <form asp-action="Create" method="post">
+                    <div class="mb-13 text-center">
+                        <h1 class="mb-3">Yeni SEO Ayarı Ekle</h1>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Sayfa Adı</span>
+                        </label>
+                        <input type="text" class="form-control form-control-solid" name="PageName" placeholder="Örn: İletişim Sayfası" required />
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">URL Yolu</span>
+                        </label>
+                        <input type="text" class="form-control form-control-solid" name="UrlPath" placeholder="Örn: /iletisim" required />
+                        <div class="text-muted fs-7 mt-1">Anasayfa için sadece / giriniz.</div>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Meta Başlık</span>
+                        </label>
+                        <input type="text" class="form-control form-control-solid" name="Title" required maxlength="160" />
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span>Meta Açıklama</span>
+                        </label>
+                        <textarea class="form-control form-control-solid" name="Description" rows="3" maxlength="300"></textarea>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span>Anahtar Kelimeler</span>
+                        </label>
+                        <input type="text" class="form-control form-control-solid" name="Keywords" placeholder="virgül ile ayırın" maxlength="200" />
+                    </div>
+                    <div class="text-center">
+                        <button type="reset" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                        <button type="submit" class="btn btn-primary">Ekle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

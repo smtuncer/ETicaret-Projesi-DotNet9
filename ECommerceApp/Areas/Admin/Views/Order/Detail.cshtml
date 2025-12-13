@@ -1,0 +1,428 @@
+@model ECommerceApp.Models.Order
+
+@{
+    ViewData["Title"] = "Sipariş Detayı";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Sipariş Detayı: @Model.OrderNumber</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-action="Index" class="text-muted text-hover-primary">Siparişler</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Detay</li>
+                    </ul>
+                </div>
+                <div class="card-toolbar">
+                    <a asp-action="Index" class="btn btn-sm btn-light">Geri Dön</a>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success d-flex align-items-center p-5 mb-5">
+                        <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4"><span class="path1"></span><span class="path2"></span></i>
+                        <div class="d-flex flex-column">
+                            <h4 class="mb-1 text-success">Başarılı</h4>
+                            <span>@TempData["SuccessMessage"]</span>
+                        </div>
+                    </div>
+                }
+                
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger d-flex align-items-center p-5 mb-5">
+                        <i class="ki-duotone ki-cross-circle fs-2hx text-danger me-4"><span class="path1"></span><span class="path2"></span></i>
+                        <div class="d-flex flex-column">
+                            <h4 class="mb-1 text-danger">Hata</h4>
+                            <span>@TempData["ErrorMessage"]</span>
+                        </div>
+                    </div>
+                }
+
+                <div class="d-flex flex-column flex-xl-row">
+                    <!-- Order Details -->
+                    <div class="flex-column flex-lg-row-auto w-100 w-xl-350px mb-10">
+                        <div class="card mb-5 mb-xl-8">
+                            <div class="card-body pt-15">
+                                <div class="d-flex flex-center flex-column mb-5">
+                                    <div class="fs-3 text-gray-800 text-hover-primary fw-bold mb-1">@Model.User?.Name @Model.User?.Surname</div>
+                                    <div class="fs-5 fw-semibold text-muted mb-6">@Model.User?.Email</div>
+                                </div>
+                                <div class="d-flex flex-stack fs-4 py-3">
+                                    <div class="fw-bold rotate collapsible" data-bs-toggle="collapse" href="#kt_customer_view_details" role="button" aria-expanded="false" aria-controls="kt_customer_view_details">
+                                        Detaylar
+                                        <span class="ms-2 rotate-180">
+                                            <i class="ki-duotone ki-down fs-3"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="separator separator-dashed my-3"></div>
+                                <div id="kt_customer_view_details" class="collapse show">
+                                    <div class="py-5">
+                                        <div class="d-flex flex-stack">
+                                            <div class="text-gray-400 fw-bold">Sipariş No:</div>
+                                            <div class="text-gray-800 fw-bold">@Model.OrderNumber</div>
+                                        </div>
+                                        <div class="d-flex flex-stack mt-3">
+                                            <div class="text-gray-400 fw-bold">Tarih:</div>
+                                            <div class="text-gray-800 fw-bold">@Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</div>
+                                        </div>
+                                        <div class="d-flex flex-stack mt-3">
+                                            <div class="text-gray-400 fw-bold">Ödeme Yöntemi:</div>
+                                            <div class="text-gray-800 fw-bold">
+                                                @(Model.PaymentMethod == ECommerceApp.Models.PaymentMethod.CreditCard ? "Kredi Kartı" : "Havale/EFT")
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-stack mt-3">
+                                            <div class="text-gray-400 fw-bold">Durum:</div>
+                                            <div class="text-gray-800 fw-bold">
+                                                @if (Model.Status == ECommerceApp.Models.OrderStatus.Pending)
+                                                {
+                                                    <span class="badge badge-light-warning">Beklemede</span>
+                                                }
+                                                else if (Model.Status == ECommerceApp.Models.OrderStatus.Approved)
+                                                {
+                                                    <span class="badge badge-light-success">Onaylandı</span>
+                                                }
+                                                else if (Model.Status == ECommerceApp.Models.OrderStatus.Shipped)
+                                                {
+                                                    <span class="badge badge-light-info">Kargolandı</span>
+                                                }
+                                                else if (Model.Status == ECommerceApp.Models.OrderStatus.Delivered)
+                                                {
+                                                    <span class="badge badge-light-success">Teslim Edildi</span>
+                                                }
+                                                else if (Model.Status == ECommerceApp.Models.OrderStatus.Cancelled)
+                                                {
+                                                    <span class="badge badge-light-danger">İptal Edildi</span>
+                                                }
+                                                else if (Model.Status == ECommerceApp.Models.OrderStatus.Refunded)
+                                                {
+                                                    <span class="badge badge-light-secondary">İade Edildi</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Update Status -->
+                        <div class="card mb-5 mb-xl-8">
+                            <div class="card-header border-0">
+                                <div class="card-title">
+                                    <h3 class="fw-bold m-0">Durum Güncelle</h3>
+                                </div>
+                            </div>
+                            <div class="card-body pt-2">
+                                <form asp-action="UpdateStatus" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <div class="d-flex flex-column mb-7">
+                                        <label class="fs-6 fw-semibold mb-2">Sipariş Durumu</label>
+                                        <select name="status" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
+                                            @foreach (var status in Enum.GetValues(typeof(ECommerceApp.Models.OrderStatus)))
+                                            {
+                                                <option value="@status" selected="@(Model.Status.Equals(status))">@status</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Güncelle</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Shipping Address -->
+                        <div class="card mb-5 mb-xl-8">
+                            <div class="card-header border-0">
+                                <div class="card-title">
+                                    <h3 class="fw-bold m-0">Teslimat Adresi</h3>
+                                </div>
+                            </div>
+                            <div class="card-body pt-2">
+                                <div class="d-flex flex-column">
+                                    <div class="fw-bold fs-5 mb-1">@Model.ShippingAddressTitle</div>
+                                    <div class="text-gray-600">
+                                        @Model.ShippingAddressDetail<br />
+                                        @Model.ShippingAddressDistrict / @Model.ShippingAddressCity<br />
+                                        @Model.ShippingZipCode
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Billing Address -->
+                        <div class="card mb-5 mb-xl-8">
+                            <div class="card-header border-0">
+                                <div class="card-title">
+                                    <h3 class="fw-bold m-0">Fatura Adresi</h3>
+                                </div>
+                            </div>
+                            <div class="card-body pt-2">
+                                <div class="d-flex flex-column">
+                                    @if (!string.IsNullOrEmpty(Model.BillingAddressTitle))
+                                    {
+                                        <div class="fw-bold fs-5 mb-1">@Model.BillingAddressTitle</div>
+                                        <div class="text-gray-600">
+                                            <strong>Adres:</strong> @Model.BillingAddressDetail<br />
+                                            @Model.BillingAddressDistrict / @Model.BillingAddressCity<br />
+                                            @Model.BillingZipCode
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.BillingCompanyName))
+                                        {
+                                            <div class="mt-3 border-top pt-2">
+                                                <div class="fw-bold text-gray-800">Kurumsal:</div>
+                                                <div class="text-gray-600">@Model.BillingCompanyName</div>
+                                                <div class="text-gray-600">@Model.BillingTaxOffice / @Model.BillingTaxNumber</div>
+                                            </div>
+                                        }
+                                        else if (!string.IsNullOrEmpty(Model.BillingIdentityNumber))
+                                        {
+                                            <div class="mt-3 border-top pt-2">
+                                                <div class="fw-bold text-gray-800">Bireysel:</div>
+                                                <div class="text-gray-600">TCKN: @Model.BillingIdentityNumber</div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-gray-600">Fatura adresi belirtilmemiş.</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Kargo Notu -->
+                        <div class="card mb-5 mb-xl-8">
+                            <div class="card-header border-0">
+                                <div class="card-title">
+                                    <h3 class="fw-bold m-0">Kargo Notu</h3>
+                                </div>
+                            </div>
+                            <div class="card-body pt-2">
+                                @if (!string.IsNullOrEmpty(Model.ShippingNote))
+                                {
+                                    <div class="alert alert-info d-flex align-items-center p-5 mb-5">
+                                        <i class="ki-duotone ki-information fs-2hx text-info me-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                        <div class="d-flex flex-column">
+                                            <h5 class="mb-1">Mevcut Not</h5>
+                                            <span>@Model.ShippingNote</span>
+                                            @if (Model.ShippingNoteDate.HasValue)
+                                            {
+                                                <small class="text-muted mt-2">
+                                                    @Model.ShippingNoteDate.Value.ToString("dd.MM.yyyy HH:mm") 
+                                                    @if (!string.IsNullOrEmpty(Model.ShippingNoteBy))
+                                                    {
+                                                        <span>- @Model.ShippingNoteBy</span>
+                                                    }
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <form asp-action="UpdateShippingNote" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <div class="d-flex flex-column mb-7">
+                                        <label class="fs-6 fw-semibold mb-2">Kargo Notu</label>
+                                        <textarea name="shippingNote" class="form-control form-control-solid" rows="4" placeholder="Kargo takip numarası, kargo firması vb. bilgileri buraya girebilirsiniz...">@Model.ShippingNote</textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Notu Kaydet</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Navlungo Integration -->
+                        <div class="card mb-5 mb-xl-8">
+                            <div class="card-header border-0">
+                                <div class="card-title">
+                                    <h3 class="fw-bold m-0">Navlungo Entegrasyonu</h3>
+                                </div>
+                            </div>
+                            <div class="card-body pt-2">
+                                @if (string.IsNullOrEmpty(Model.NavlungoPostNumber))
+                                {
+                                    <form asp-action="CreateNavlungoShipment" method="post">
+                                        <input type="hidden" name="id" value="@Model.Id" />
+                                        <div class="alert alert-warning d-flex align-items-center p-5 mb-5">
+                                            <i class="ki-duotone ki-delivery-2 fs-2hx text-warning me-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                            <div class="d-flex flex-column">
+                                                <h5 class="mb-1">Navlungo Gönderisi</h5>
+                                                <span>Bu sipariş için henüz Navlungo kaydı oluşturulmadı. Aşağıdaki butona tıklayarak gönderi oluşturabilirsiniz.</span>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-warning w-100">
+                                            <i class="ki-duotone ki-delivery-2 fs-2 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                            Navlungo'ya Gönder
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-success d-flex align-items-center p-5 mb-5">
+                                        <i class="ki-duotone ki-check-circle fs-2hx text-success me-4"><span class="path1"></span><span class="path2"></span></i>
+                                        <div class="d-flex flex-column">
+                                            <h5 class="mb-1">Gönderi Oluşturuldu</h5>
+                                            <span>Navlungo Takip No: <strong>@Model.NavlungoPostNumber</strong></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <form asp-action="GetNavlungoLabel" method="post" target="_blank">
+                                        <input type="hidden" name="id" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                                            <i class="ki-duotone ki-document fs-2 me-2"><span class="path1"></span><span class="path2"></span></i>
+                                            Kargo Etiketini İndir / Yazdır
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="flex-lg-row-fluid ms-lg-15">
+                        <div class="card pt-4 mb-6 mb-xl-9">
+                            <div class="card-header border-0">
+                                <div class="card-title">
+                                    <h2>Sipariş İçeriği</h2>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0 pb-5">
+                                <div class="table-responsive">
+                                    <table class="table align-middle table-row-dashed gy-5" id="kt_table_customers_payment">
+                                        <thead class="border-bottom border-gray-200 fs-7 fw-bold">
+                                            <tr class="text-start text-muted text-uppercase gs-0">
+                                                <th>Ürün</th>
+                                                <th>Birim Fiyat</th>
+                                                <th>Adet</th>
+                                                <th class="text-end">Toplam</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="fs-6 fw-semibold text-gray-600">
+                                            @foreach (var item in Model.Items)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            @if (item.Product?.Images != null && item.Product.Images.Any())
+                                                            {
+                                                                <div class="symbol symbol-50px me-5">
+                                                                    <img src="@item.Product.Images.First().ImageUrl" alt="" />
+                                                                </div>
+                                                            }
+                                                            <div class="d-flex flex-column">
+                                                                <a href="#" class="text-gray-800 text-hover-primary mb-1">@item.ProductName</a>
+                                                                <span>Kod: @(item.Product?.Id ?? 0)</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @item.Price.ToString("N2") ₺
+                                                        <br />
+                                                        <small class="text-muted">+ %@item.VatRate.ToString("0") KDV (@((item.VatAmount / item.Quantity).ToString("N2")) ₺)</small>
+                                                    </td>
+                                                    <td>@item.Quantity</td>
+                                                    <td class="text-end">@((item.Price * item.Quantity + item.VatAmount).ToString("N2")) ₺</td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <td colspan="3" class="text-end fs-6 fw-semibold text-gray-600">Ürünler Toplamı</td>
+                                                <td class="text-end fs-6 fw-semibold text-gray-600">@((Model.SubTotalWithoutVat + Model.VatAmount).ToString("N2")) ₺</td>
+                                            </tr>
+                                            @if (!string.IsNullOrEmpty(Model.CouponCode))
+                                            {
+                                                <tr>
+                                                    <td colspan="3" class="text-end fs-6 fw-semibold text-success">
+                                                        İndirim (@Model.CouponCode)
+                                                    </td>
+                                                    <td class="text-end fs-6 fw-semibold text-success">-@Model.DiscountAmount?.ToString("N2") ₺</td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <td colspan="3" class="text-end fs-6 fw-semibold text-gray-600">Kargo Ücreti</td>
+                                                <td class="text-end fs-6 fw-semibold text-gray-600">@(Model.ShippingFee == 0 ? "Ücretsiz" : "+" + Model.ShippingFee.ToString("N2") + " ₺")</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td colspan="3" class="text-end fs-4 fw-bold text-gray-900">Genel Toplam</td>
+                                                <td class="text-end fs-4 fw-bold text-gray-900">@Model.TotalAmount.ToString("N2") ₺</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Notifications -->
+                        @if (Model.PaymentNotifications != null && Model.PaymentNotifications.Any())
+                        {
+                            <div class="card pt-4 mb-6 mb-xl-9">
+                                <div class="card-header border-0">
+                                    <div class="card-title">
+                                        <h2>Ödeme Bildirimleri</h2>
+                                    </div>
+                                </div>
+                                <div class="card-body pt-0 pb-5">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-row-dashed gy-5">
+                                            <thead class="border-bottom border-gray-200 fs-7 fw-bold">
+                                                <tr class="text-start text-muted text-uppercase gs-0">
+                                                    <th>Tarih</th>
+                                                    <th>Gönderen</th>
+                                                    <th>Tutar</th>
+                                                    <th>Not</th>
+                                                    <th>Durum</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="fs-6 fw-semibold text-gray-600">
+                                                @foreach (var notif in Model.PaymentNotifications)
+                                                {
+                                                    <tr>
+                                                        <td>@notif.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                                        <td>@notif.SenderName</td>
+                                                        <td>@notif.Amount.ToString("N2") ₺</td>
+                                                        <td>@notif.Note</td>
+                                                        <td>
+                                                            @if (notif.Status == ECommerceApp.Models.PaymentNotificationStatus.Pending)
+                                                            {
+                                                                <span class="badge badge-light-warning">Beklemede</span>
+                                                            }
+                                                            else if (notif.Status == ECommerceApp.Models.PaymentNotificationStatus.Approved)
+                                                            {
+                                                                <span class="badge badge-light-success">Onaylandı</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge badge-light-danger">Reddedildi</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

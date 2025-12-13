@@ -1,0 +1,237 @@
+@using System.Linq
+@model ECommerceApp.Areas.User.ViewModels.HomeIndexViewModel
+
+<div id="homepage-4">
+    @if (Model.Sliders != null && Model.Sliders.Any())
+    {
+        <div class="ps-home-banner">
+            <div class="container">
+                <div class="ps-carousel--nav-inside owl-slider" data-owl-auto="true" data-owl-loop="true" data-owl-speed="5000" data-owl-gap="0" data-owl-nav="true" data-owl-dots="true" data-owl-item="1" data-owl-item-xs="1" data-owl-item-sm="1" data-owl-item-md="1" data-owl-item-lg="1" data-owl-duration="1000" data-owl-mousedrag="on">
+                    @foreach (var slider in Model.Sliders)
+                    {
+                        @if (!string.IsNullOrEmpty(slider.LinkUrl))
+                        {
+                            <a href="@slider.LinkUrl">
+                                <img loading="lazy" src="@slider.ImageUrl" alt="@slider.Title">
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="#">
+                                <img loading="lazy" src="@slider.ImageUrl" alt="@slider.Title">
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Fallback: Default slider if no sliders in database -->
+        <div class="ps-home-banner">
+            <div class="container">
+                <div class="ps-section__left">
+                    <div class="ps-carousel--nav-inside owl-slider" data-owl-auto="true" data-owl-loop="true" data-owl-speed="5000" data-owl-gap="0" data-owl-nav="true" data-owl-dots="true" data-owl-item="1" data-owl-item-xs="1" data-owl-item-sm="1" data-owl-item-md="1" data-owl-item-lg="1" data-owl-duration="1000" data-owl-mousedrag="on">
+                        <a href="#"><img loading="lazy" src="img/slider/home-4/1.jpg" alt=""></a>
+                        <a href="#"><img loading="lazy" src="img/slider/home-4/2.jpg" alt=""></a>
+                        <a href="#"><img loading="lazy" src="img/slider/home-4/3.jpg" alt=""></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="ps-deal-of-day">
+        <div class="container">
+            <div class="ps-section__header">
+                <div class="ps-block--countdown-deal">
+                    <div class="ps-block__left">
+                        <h3>Öne Çıkan Ürünler</h3>
+                    </div>
+                    @* Countdown removed as per request for Featured Products context *@
+                </div>
+                <a href="@Url.Action("Index", "Product")">Tümünü Gör</a>
+            </div>
+            <div class="ps-section__content">
+                <div class="ps-carousel--nav owl-slider" data-owl-auto="true" data-owl-loop="true" data-owl-speed="5000" data-owl-gap="30" data-owl-nav="true" data-owl-dots="true" data-owl-item="5" data-owl-item-xs="2" data-owl-item-sm="3" data-owl-item-md="4" data-owl-item-lg="4" data-owl-item-xl="5" data-owl-duration="1000" data-owl-mousedrag="on">
+                    @if (Model.FeaturedProducts != null && Model.FeaturedProducts.Any())
+                    {
+                        foreach (var product in Model.FeaturedProducts)
+                        {
+                            <div class="ps-product ps-product--inner">
+                                <div class="ps-product__thumbnail">
+                                    <a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">
+                                        <img loading="lazy" src="@(string.IsNullOrEmpty(product.PrimaryImageUrl) ? "img/products/home/1.jpg" : product.PrimaryImageUrl)" alt="@product.Name">
+                                    </a>
+                                    <div class="ps-product__badge">Öne Çıkan</div>
+                                    <ul class="ps-product__actions">
+                                        <li><a href="javascript:void(0);" onclick="addToCart(@product.Id, 1)" data-bs-toggle="tooltip" data-placement="top" title="Sepete Ekle"><i class="icon-bag2"></i></a></li>
+                                        <li><a href="javascript:void(0);" onclick="toggleFavorite(@product.Id, this)" class="toggle-favorite" data-id="@product.Id" data-bs-toggle="tooltip" data-placement="top" title="Favorilere Ekle"><i class="icon-heart"></i></a></li>
+                                        <li><a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)" data-bs-toggle="tooltip" data-placement="top" title="İncele"><i class="icon-eye"></i></a></li>
+                                    </ul>
+                                </div>
+                                <div class="ps-product__container">
+                                    <p class="ps-product__price">@product.Price.ToString("N2") ₺</p>
+                                    <div class="ps-product__content">
+                                        <a class="ps-product__title" href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">@product.Name</a>
+                                        @if (!string.IsNullOrEmpty(product.BrandName))
+                                        {
+                                            <p>Marka: <a href="#">@product.BrandName</a></p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-12">
+                            <p class="text-center py-5">Öne çıkan ürün bulunamadı.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Best Sellers Section -->
+    <div class="ps-deal-of-day">
+        <div class="container">
+            <div class="ps-section__header">
+                <div class="ps-block--countdown-deal">
+                    <div class="ps-block__left">
+                        <h3>Çok Satan Ürünler</h3>
+                    </div>
+                </div>
+                <a href="/urunler?sort=bestseller">Tümünü Gör</a>
+            </div>
+            <div class="ps-section__content">
+                <div class="ps-carousel--nav owl-slider" data-owl-auto="true" data-owl-loop="true" data-owl-speed="5000" data-owl-gap="30" data-owl-nav="true" data-owl-dots="true" data-owl-item="5" data-owl-item-xs="2" data-owl-item-sm="3" data-owl-item-md="4" data-owl-item-lg="4" data-owl-item-xl="5" data-owl-duration="1000" data-owl-mousedrag="on">
+                    @if (Model.BestSellerProducts != null && Model.BestSellerProducts.Any())
+                    {
+                        foreach (var product in Model.BestSellerProducts)
+                        {
+                            <div class="ps-product ps-product--inner">
+                                <div class="ps-product__thumbnail">
+                                    <a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">
+                                        <img loading="lazy" src="@(string.IsNullOrEmpty(product.PrimaryImageUrl) ? "img/products/home/1.jpg" : product.PrimaryImageUrl)" alt="@product.Name">
+                                    </a>
+                                    <div class="ps-product__badge" style="background-color: #fcb800;">Çok Satan</div>
+                                    <ul class="ps-product__actions">
+                                        <li><a href="javascript:void(0);" onclick="addToCart(@product.Id, 1)" data-bs-toggle="tooltip" data-placement="top" title="Sepete Ekle"><i class="icon-bag2"></i></a></li>
+                                        <li><a href="javascript:void(0);" onclick="toggleFavorite(@product.Id, this)" class="toggle-favorite" data-id="@product.Id" data-bs-toggle="tooltip" data-placement="top" title="Favorilere Ekle"><i class="icon-heart"></i></a></li>
+                                        <li><a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)" data-bs-toggle="tooltip" data-placement="top" title="İncele"><i class="icon-eye"></i></a></li>
+                                    </ul>
+                                </div>
+                                <div class="ps-product__container">
+                                    <p class="ps-product__price">@product.Price.ToString("N2") ₺</p>
+                                    <div class="ps-product__content">
+                                        <a class="ps-product__title" href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">@product.Name</a>
+                                        @if (!string.IsNullOrEmpty(product.BrandName))
+                                        {
+                                            <p>Marka: <a href="#">@product.BrandName</a></p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                         <div class="col-12">
+                            <p class="text-center py-5">Çok satan ürün bulunamadı.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.FeaturedCategoryProducts != null && Model.FeaturedCategoryProducts.Any())
+    {
+        foreach (var categorySection in Model.FeaturedCategoryProducts)
+        {
+            <div class="ps-deal-of-day">
+                <div class="container">
+                    <div class="ps-section__header">
+                        <div class="ps-block--countdown-deal">
+                            <div class="ps-block__left">
+                                <h3>@categorySection.CategoryName</h3>
+                            </div>
+                        </div>
+                        <a href="@categorySection.CategoryUrl">Tümünü Gör</a>
+                    </div>
+                    <div class="ps-section__content">
+                        <div class="ps-carousel--nav owl-slider" data-owl-auto="true" data-owl-loop="true" data-owl-speed="5000" data-owl-gap="30" data-owl-nav="true" data-owl-dots="true" data-owl-item="5" data-owl-item-xs="2" data-owl-item-sm="3" data-owl-item-md="4" data-owl-item-lg="4" data-owl-item-xl="5" data-owl-duration="1000" data-owl-mousedrag="on">
+                            @foreach (var product in categorySection.Products)
+                            {
+                                <div class="ps-product ps-product--inner">
+                                    <div class="ps-product__thumbnail">
+                                        <a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">
+                                            <img loading="lazy" src="@(string.IsNullOrEmpty(product.PrimaryImageUrl) ? "img/products/home/1.jpg" : product.PrimaryImageUrl)" alt="@product.Name">
+                                        </a>
+                                        <ul class="ps-product__actions">
+                                            <li><a href="javascript:void(0);" onclick="addToCart(@product.Id, 1)" data-bs-toggle="tooltip" data-placement="top" title="Sepete Ekle"><i class="icon-bag2"></i></a></li>
+                                            <li><a href="javascript:void(0);" onclick="toggleFavorite(@product.Id, this)" class="toggle-favorite" data-id="@product.Id" data-bs-toggle="tooltip" data-placement="top" title="Favorilere Ekle"><i class="icon-heart"></i></a></li>
+                                            <li><a href="@Url.ProductUrl(product.Id, product.Name, product.Slug)" data-bs-toggle="tooltip" data-placement="top" title="İncele"><i class="icon-eye"></i></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="ps-product__container">
+                                        <p class="ps-product__price">@product.Price.ToString("N2") ₺</p>
+                                        <div class="ps-product__content">
+                                            <a class="ps-product__title" href="@Url.ProductUrl(product.Id, product.Name, product.Slug)">@product.Name</a>
+                                            @if (!string.IsNullOrEmpty(product.BrandName))
+                                            {
+                                                <p>Marka: <a href="#">@product.BrandName</a></p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    
+    @if (Model.LatestBlogs != null && Model.LatestBlogs.Any())
+    {
+        <div class="ps-deal-of-day">
+            <div class="container">
+                <div class="ps-section__header">
+                    <div class="ps-block--countdown-deal">
+                        <div class="ps-block__left">
+                            <h3>Son Blog Yazıları</h3>
+                        </div>
+                    </div>
+                    <a href="@Url.Action("Index", "Blog")">Tümünü Gör</a>
+                </div>
+                <div class="ps-section__content">
+                    <div class="ps-carousel--nav owl-slider" data-owl-auto="true" data-owl-loop="true" data-owl-speed="5000" data-owl-gap="30" data-owl-nav="true" data-owl-dots="true" data-owl-item="4" data-owl-item-xs="1" data-owl-item-sm="2" data-owl-item-md="3" data-owl-item-lg="4" data-owl-duration="1000" data-owl-mousedrag="on">
+                        @foreach (var blog in Model.LatestBlogs)
+                        {
+                            <div class="ps-post mb-4 border rounded overflow-hidden h-100 shadow-sm">
+                                <div class="ps-post__thumbnail">
+                                    <a class="ps-post__overlay" href="@Url.Action("Detail", "Blog", new { slug = blog.Slug, id = blog.Id })"></a>
+                                    <img src="@(string.IsNullOrEmpty(blog.FeaturedImage) ? "/martfury/img/blog/default.jpg" : blog.FeaturedImage)" alt="@blog.Title" style="height: 200px; object-fit: cover; width: 100%;">
+                                </div>
+                                <div class="ps-post__content p-4 bg-white">
+                                    <div class="ps-post__meta mb-2">
+                                        <span class="text-muted small"><i class="icon-calendar me-1"></i> @blog.CreatedDate.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</span>
+                                    </div>
+                                    <a class="ps-post__title d-block h5 text-dark fw-bold mb-3 text-truncate" href="@Url.Action("Detail", "Blog", new { slug = blog.Slug, id = blog.Id })" title="@blog.Title">@blog.Title</a>
+                                    <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">@blog.Summary</p>
+                                    <a class="ps-btn ps-btn--outline ps-btn--sm" href="@Url.Action("Detail", "Blog", new { slug = blog.Slug, id = blog.Id })">Devamını Oku</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+</div>

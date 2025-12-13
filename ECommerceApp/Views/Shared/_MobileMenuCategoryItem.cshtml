@@ -1,0 +1,20 @@
+@model ECommerceApp.Models.Category
+@{
+    var activeSubs = Model.SubCategories?.Where(c => c.IsActive).OrderBy(c => c.Order).ThenBy(c => c.Name).ToList();
+    bool hasChildren = activeSubs != null && activeSubs.Any();
+}
+
+@using ECommerceApp.Helper
+<li class="@(hasChildren ? "menu-item-has-children" : "")">
+    <a href="@Url.CategoryUrl(Model.Id, Model.Name)">@Model.Name</a>
+    @if (hasChildren)
+    {
+        <span class="sub-toggle"></span>
+        <ul class="sub-menu">
+            @foreach (var sub in activeSubs)
+            {
+                <partial name="_MobileMenuCategoryItem" model="sub" />
+            }
+        </ul>
+    }
+</li>

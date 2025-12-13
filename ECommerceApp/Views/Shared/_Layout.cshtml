@@ -1,0 +1,68 @@
+﻿@{
+    Layout = null; 
+}
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="robots" content="index, follow">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    @await Component.InvokeAsync("SeoTags")
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,600,700&amp;amp;subset=latin-ext" rel="stylesheet">
+    <link rel="stylesheet" href="~/martfury/plugins/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="~/martfury/fonts/Linearicons/Linearicons/Font/demo-files/demo.css">
+    <link rel="stylesheet" href="~/martfury/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/martfury/plugins/owl-carousel/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/martfury/plugins/owl-carousel/assets/owl.theme.default.min.css">
+    <link rel="stylesheet" href="~/martfury/plugins/slick/slick/slick.css">
+    <link rel="stylesheet" href="~/martfury/plugins/nouislider/nouislider.min.css">
+    <link rel="stylesheet" href="~/martfury/plugins/lightGallery-master/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="~/martfury/plugins/jquery-bar-rating/dist/themes/fontawesome-stars.css">
+    <link rel="stylesheet" href="~/martfury/plugins/select2/dist/css/select2.min.css">
+    <link rel="preload" href="~/martfury/css/style.css" as="style">
+    <link rel="stylesheet" href="~/martfury/css/style.css">
+    <link rel="stylesheet" href="~/martfury/css/market-place-2.css">
+    <link rel="stylesheet" href="~/css/custom.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    @await Component.InvokeAsync("Header")
+    
+    <main class="flex-grow-1">
+        @RenderBody()
+    </main>
+    
+    @await Component.InvokeAsync("Footer")
+
+    <script src="~/martfury/plugins/jquery-3.7.1.min.js"></script>
+    <script src="~/martfury/plugins/nouislider/nouislider.min.js"></script>
+    <script src="~/martfury/plugins/popper.min.js"></script>
+    <script src="~/martfury/plugins/owl-carousel/owl.carousel.min.js"></script>
+    <script src="~/martfury/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/martfury/plugins/imagesloaded.pkgd.min.js"></script>
+    <script src="~/martfury/plugins/masonry.pkgd.min.js"></script>
+    <script src="~/martfury/plugins/isotope.pkgd.min.js"></script>
+    <script src="~/martfury/plugins/jquery.matchHeight-min.js"></script>
+    <script src="~/martfury/plugins/slick/slick/slick.min.js"></script>
+    <script src="~/martfury/plugins/jquery-bar-rating/dist/jquery.barrating.min.js"></script>
+    <script src="~/martfury/plugins/slick-animation.min.js"></script>
+    <script src="~/martfury/plugins/lightGallery-master/dist/js/lightgallery-all.min.js"></script>
+    <script src="~/martfury/plugins/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/martfury/plugins/gmap3.min.js"></script>
+    <!-- custom scripts-->
+    <script src="~/martfury/js/main.js"></script>
+    <script src="~/js/favorites.js"></script>
+    <script src="~/js/cart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @await Component.InvokeAsync("NToastNotify")
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

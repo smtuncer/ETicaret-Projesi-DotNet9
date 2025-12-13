@@ -1,0 +1,317 @@
+﻿@model ECommerceApp.Areas.Admin.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <!-- Toolbar -->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Dashboard</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <span class="text-muted">Hoş Geldiniz</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center gap-2 gap-lg-3">
+                    <span class="badge badge-light-primary fs-7">@DateTime.Now.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                <!-- İstatistik Kartları -->
+                <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+                    <!-- Toplam Ürünler -->
+                    <div class="col-md-6 col-lg-6 col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <div class="d-flex align-items-center">
+                                        <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1">@Model.TotalProducts</span>
+                                    </div>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Toplam Ürün</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex align-items-end pt-0">
+                                <div class="d-flex align-items-center flex-column w-100">
+                                    <div class="d-flex justify-content-between w-100 mt-auto mb-2">
+                                        <span class="fw-bolder fs-6 text-gray-500">Aktif Ürünler</span>
+                                    </div>
+                                    <div class="h-8px mx-3 w-100 bg-light-primary rounded">
+                                        <div class="bg-primary rounded h-8px" role="progressbar" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toplam Siparişler -->
+                    <div class="col-md-6 col-lg-6 col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <div class="d-flex align-items-center">
+                                        <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1">@Model.TotalOrders</span>
+                                    </div>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Toplam Sipariş</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex align-items-end pt-0">
+                                <div class="d-flex align-items-center flex-column w-100">
+                                    <div class="d-flex justify-content-between w-100 mt-auto mb-2">
+                                        <span class="fw-bolder fs-6 text-gray-500">Bu Ay: @Model.MonthlyOrders</span>
+                                    </div>
+                                    <div class="h-8px mx-3 w-100 bg-light-success rounded">
+                                        <div class="bg-success rounded h-8px" role="progressbar" style="width: @(Model.TotalOrders > 0 ? (Model.MonthlyOrders * 100 / Model.TotalOrders) : 0)%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toplam Gelir -->
+                    <div class="col-md-6 col-lg-6 col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <div class="d-flex align-items-center">
+                                        <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1">@Model.TotalRevenue.ToString("N0")</span>
+                                        <span class="fs-6 fw-semibold text-gray-500">₺</span>
+                                    </div>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Toplam Gelir</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex align-items-end pt-0">
+                                <div class="d-flex align-items-center flex-column w-100">
+                                    <div class="d-flex justify-content-between w-100 mt-auto mb-2">
+                                        <span class="fw-bolder fs-6 text-gray-500">Bu Ay: @Model.MonthlyRevenue.ToString("N0") ₺</span>
+                                    </div>
+                                    <div class="h-8px mx-3 w-100 bg-light-info rounded">
+                                        <div class="bg-info rounded h-8px" role="progressbar" style="width: @(Model.TotalRevenue > 0 ? (Model.MonthlyRevenue * 100 / Model.TotalRevenue) : 0)%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toplam Kullanıcılar -->
+                    <div class="col-md-6 col-lg-6 col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <div class="d-flex align-items-center">
+                                        <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1">@Model.TotalUsers</span>
+                                    </div>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Toplam Kullanıcı</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex align-items-end pt-0">
+                                <div class="d-flex align-items-center flex-column w-100">
+                                    <div class="d-flex justify-content-between w-100 mt-auto mb-2">
+                                        <span class="fw-bolder fs-6 text-gray-500">Kayıtlı Üyeler</span>
+                                    </div>
+                                    <div class="h-8px mx-3 w-100 bg-light-warning rounded">
+                                        <div class="bg-warning rounded h-8px" role="progressbar" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bekleyen İşlemler & Hızlı Aksiyonlar -->
+                <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+                    <!-- Bekleyen İşlemler -->
+                    <div class="col-xl-8">
+                        <div class="card card-flush h-xl-100">
+                            <div class="card-header pt-7">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-gray-900">Bekleyen İşlemler</span>
+                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">Dikkat gerektiren öğeler</span>
+                                </h3>
+                            </div>
+                            <div class="card-body pt-6">
+                                <div class="row g-5">
+                                    <div class="col-sm-6">
+                                        <a href="@Url.Action("Index", "Order")" class="d-block bg-light-warning rounded p-6 hover-elevate-up">
+                                            <i class="ki-duotone ki-basket fs-3x text-warning mb-3">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                                <span class="path4"></span>
+                                            </i>
+                                            <div class="fw-bold fs-2 text-gray-900 mb-2">@Model.PendingOrders</div>
+                                            <div class="fw-semibold text-gray-600">Bekleyen Sipariş</div>
+                                        </a>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <a href="@Url.Action("Index", "Inbox")" class="d-block bg-light-danger rounded p-6 hover-elevate-up">
+                                            <i class="ki-duotone ki-message-text-2 fs-3x text-danger mb-3">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                            <div class="fw-bold fs-2 text-gray-900 mb-2">@Model.UnreadMessages</div>
+                                            <div class="fw-semibold text-gray-600">Okunmamış Mesaj</div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hızlı Aksiyonlar -->
+                    <div class="col-xl-4">
+                        <div class="card card-flush h-xl-100">
+                            <div class="card-header pt-7">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-gray-900">Hızlı Aksiyonlar</span>
+                                </h3>
+                            </div>
+                            <div class="card-body pt-5">
+                                <a asp-controller="Product" asp-action="Create" class="btn btn-primary w-100 mb-3">
+                                    <i class="ki-duotone ki-plus fs-2"></i>
+                                    Yeni Ürün Ekle
+                                </a>
+                                <a asp-controller="Order" asp-action="Index" class="btn btn-success w-100 mb-3">
+                                    <i class="ki-duotone ki-basket fs-2"></i>
+                                    Siparişleri Görüntüle
+                                </a>
+                                <a asp-controller="Slider" asp-action="Create" class="btn btn-info w-100">
+                                    <i class="ki-duotone ki-picture fs-2"></i>
+                                    Yeni Slider Ekle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Son Siparişler & Düşük Stok -->
+                <div class="row g-5 g-xl-10">
+                    <!-- Son Siparişler -->
+                    <div class="col-xl-6">
+                        <div class="card card-flush h-xl-100">
+                            <div class="card-header pt-7">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-gray-900">Son Siparişler</span>
+                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">Son 5 sipariş</span>
+                                </h3>
+                                <div class="card-toolbar">
+                                    <a asp-controller="Order" asp-action="Index" class="btn btn-sm btn-light">Tümünü Gör</a>
+                                </div>
+                            </div>
+                            <div class="card-body pt-6">
+                                <div class="table-responsive">
+                                    <table class="table table-row-dashed align-middle gs-0 gy-3">
+                                        <thead>
+                                            <tr class="border-0">
+                                                <th class="p-0 min-w-100px">Sipariş No</th>
+                                                <th class="p-0 min-w-100px">Müşteri</th>
+                                                <th class="p-0 min-w-90px">Tutar</th>
+                                                <th class="p-0 min-w-50px text-end">Durum</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.RecentOrders.Any())
+                                            {
+                                                @foreach (var order in Model.RecentOrders)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <a asp-controller="Order" asp-action="Details" asp-route-id="@order.Id" class="text-gray-900 fw-bold text-hover-primary">#@order.Id</a>
+                                                        </td>
+                                                        <td class="text-gray-600 fw-semibold">@order.User?.Name @order.User?.Surname</td>
+                                                        <td class="text-gray-600 fw-bold">@order.TotalAmount.ToString("N2") ₺</td>
+                                                        <td class="text-end">
+                                                            @if (order.Status == ECommerceApp.Models.OrderStatus.Delivered)
+                                                            {
+                                                                <span class="badge badge-light-success">Tamamlandı</span>
+                                                            }
+                                                            else if (order.Status == ECommerceApp.Models.OrderStatus.Pending)
+                                                            {
+                                                                <span class="badge badge-light-warning">Beklemede</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge badge-light-primary">@order.Status</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted">Henüz sipariş bulunmuyor</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Düşük Stoklu Ürünler -->
+                    <div class="col-xl-6">
+                        <div class="card card-flush h-xl-100">
+                            <div class="card-header pt-7">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-gray-900">Düşük Stoklu Ürünler</span>
+                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">Stok < 10</span>
+                                </h3>
+                                <div class="card-toolbar">
+                                    <a asp-controller="Product" asp-action="Index" class="btn btn-sm btn-light">Tümünü Gör</a>
+                                </div>
+                            </div>
+                            <div class="card-body pt-6">
+                                <div class="table-responsive">
+                                    <table class="table table-row-dashed align-middle gs-0 gy-3">
+                                        <thead>
+                                            <tr class="border-0">
+                                                <th class="p-0 min-w-200px">Ürün</th>
+                                                <th class="p-0 min-w-100px text-end">Stok</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.LowStockProducts.Any())
+                                            {
+                                                @foreach (var product in Model.LowStockProducts)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <a asp-controller="Product" asp-action="Edit" asp-route-id="@product.Id" class="text-gray-900 fw-bold text-hover-primary">@product.Name</a>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span class="badge badge-light-danger fs-7 fw-bold">@product.Stock adet</span>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="2" class="text-center text-muted">Düşük stoklu ürün bulunmuyor</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

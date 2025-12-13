@@ -1,0 +1,85 @@
+@model ECommerceApp.Models.Policy
+
+@{
+    ViewData["Title"] = "Politika Düzenle";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Politika Düzenle</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Anasayfa</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Politika Yönetimi</a></li>
+                    <li class="breadcrumb-item active">Düzenle</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Politika Bilgileri</h3>
+            </div>
+            <form asp-action="Edit">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <label asp-for="Title">Başlık</label>
+                        <input asp-for="Title" class="form-control" placeholder="Politika Başlığı">
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Slug">Slug (Boş bırakılırsa otomatik oluşturulur)</label>
+                        <input asp-for="Slug" class="form-control" placeholder="Slug">
+                        <span asp-validation-for="Slug" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Content">İçerik</label>
+                        <textarea asp-for="Content" id="summernote" class="form-control"></textarea>
+                        <span asp-validation-for="Content" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Order">Sıra</label>
+                        <input asp-for="Order" class="form-control" type="number">
+                        <span asp-validation-for="Order" class="text-danger"></span>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" asp-for="IsActive">
+                        <label class="form-check-label" asp-for="IsActive">Aktif</label>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                height: 300,
+                callbacks: {
+                    onImageUpload: function(files) {
+                        // Image upload logic can be added here if needed
+                    }
+                }
+            });
+        });
+    </script>
+}

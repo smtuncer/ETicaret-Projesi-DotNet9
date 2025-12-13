@@ -1,0 +1,91 @@
+﻿@model Blog
+@using ECommerceApp.Helper
+@inject Microsoft.AspNetCore.Mvc.IUrlHelper Url
+
+<div class="ps-page--blog">
+    <div class="ps-post--detail">
+        <div class="ps-post__header">
+            <div class="container">
+                <h1>@Model.Title</h1>
+                <p>
+                    @((Model.PublishedDate ?? Model.CreatedDate).ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))) 
+                    @if (Model.Author != null)
+                    {
+                        <text>/ @Model.Author.Name @Model.Author.Surname</text>
+                    }
+                    @if (Model.Category != null)
+                    {
+                        <text>/ <a asp-area="User" asp-controller="Blog" asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category.Name</a></text>
+                    }
+                </p>
+            </div>
+        </div>
+        <div class="container">
+            @if (!string.IsNullOrEmpty(Model.FeaturedImage))
+            {
+                <div class="ps-post__carousel">
+                    <img loading="lazy" src="@Model.FeaturedImage" alt="@Model.Title">
+                </div>
+            }
+
+            <div class="ps-post__content">
+                @if (!string.IsNullOrEmpty(Model.Summary))
+                {
+                    <h4>@Model.Summary</h4>
+                }
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+    </div>
+
+    <div class="ps-post-comments">
+        <h3>@Model.Comments.Count Yorum</h3>
+        @foreach (var comment in Model.Comments.Where(c => c.IsApproved).OrderByDescending(c => c.CreatedDate))
+        {
+            <div class="ps-block--comment">
+                <div class="ps-block__content">
+                    <h5>@comment.Name <small>@comment.CreatedDate.ToString("dd MMMM yyyy HH:mm", new System.Globalization.CultureInfo("tr-TR"))</small></h5>
+                    <p>@comment.Comment</p>
+                </div>
+            </div>
+        }
+
+        @if (TempData["CommentSuccess"] != null)
+        {
+            <div class="alert alert-success">@TempData["CommentSuccess"]</div>
+        }
+        @if (TempData["CommentError"] != null)
+        {
+            <div class="alert alert-danger">@TempData["CommentError"]</div>
+        }
+
+        <form class="ps-form--post-comment" asp-area="User" asp-controller="Blog" asp-action="AddComment" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="blogId" value="@Model.Id" />
+            <h3>Yorum Yap</h3>
+            <div class="form-group">
+                <textarea class="form-control" name="comment" rows="8" placeholder="Yorumunuz *" required></textarea>
+            </div>
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="name" placeholder="Adınız *" required>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                    <div class="form-group">
+                        <input class="form-control" type="email" name="email" placeholder="E-posta *" required>
+                    </div>
+                </div>
+                <div class="col-xl-12 col-lg-12 col-md-12 col-12">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="phoneNumber" placeholder="Telefon">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group submit">
+                <button class="ps-btn" type="submit">Yorum Gönder</button>
+            </div>
+        </form>
+    </div>
+</div>

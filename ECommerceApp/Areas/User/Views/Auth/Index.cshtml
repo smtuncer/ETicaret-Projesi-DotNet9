@@ -1,0 +1,133 @@
+﻿@model ECommerceApp.Models.ViewModels.AuthViewModel
+
+@{
+    ViewData["Title"] = "Giriş Yap / Kayıt Ol";
+}
+
+<div class="ps-page--my-account">
+    <div class="ps-my-account-2">
+        <div class="container">
+            <div class="ps-section__wrapper">
+                <div class="ps-section__left">
+                    <div class="ps-form--account ps-tab-root">
+                        <ul class="ps-tab-list">
+                            <li class="active"><a href="#sign-in">Giriş Yap</a></li>
+                            <li><a href="#register">Kayıt Ol</a></li>
+                        </ul>
+                        <div class="ps-tabs">
+                            <!-- Login Tab -->
+                            <div class="ps-tab active" id="sign-in">
+                                <form asp-action="Login" asp-controller="Auth" method="post" class="ps-form__content">
+                                    <h5>Hesabınıza Giriş Yapın</h5>
+                                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="form-group">
+                                        <input asp-for="Login.Email" class="form-control" type="email" placeholder="E-posta adresiniz">
+                                        <span asp-validation-for="Login.Email" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group form-forgot">
+                                        <input asp-for="Login.Password" class="form-control" type="password" placeholder="Şifre">
+                                        <a href="javascript:;" onclick="$('#forgotPasswordModal').modal('show');" class="ps-form__forgot-link">Şifremi Unuttum?</a>
+                                        <span asp-validation-for="Login.Password" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="ps-checkbox">
+                                            <input asp-for="Login.RememberMe" class="form-control" type="checkbox" id="remember-me" />
+                                            <label for="remember-me">Beni Hatırla</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group submit">
+                                        <button type="submit" class="ps-btn ps-btn--fullwidth">Giriş Yap</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- Register Tab -->
+                            <div class="ps-tab" id="register">
+                                <form asp-action="Register" asp-controller="Auth" method="post" class="ps-form__content">
+                                    <h5>Hesap Oluştur</h5>
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="form-group">
+                                        <input asp-for="Register.Name" class="form-control" type="text" placeholder="Adınız">
+                                        <span asp-validation-for="Register.Name" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Register.Surname" class="form-control" type="text" placeholder="Soyadınız">
+                                        <span asp-validation-for="Register.Surname" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Register.Email" class="form-control" type="email" placeholder="E-posta adresiniz">
+                                        <span asp-validation-for="Register.Email" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Register.PhoneNumber" class="form-control" type="tel" placeholder="Telefon numaranız (opsiyonel)">
+                                        <span asp-validation-for="Register.PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Register.Password" class="form-control" type="password" placeholder="Şifre (en az 6 karakter)">
+                                        <span asp-validation-for="Register.Password" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input asp-for="Register.ConfirmPassword" class="form-control" type="password" placeholder="Şifre Tekrar">
+                                        <span asp-validation-for="Register.ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                    <div class="ps-form__decs">
+                                        <p>Kişisel verileriniz, bu web sitesindeki deneyiminizi desteklemek, hesabınıza erişimi yönetmek ve <a href="/politikalar">politikalarımız da</a> açıklanan diğer amaçlar için kullanılacaktır.</p>
+                                    </div>
+                                    <div class="form-group submit">
+                                        <button type="submit" class="ps-btn ps-btn--fullwidth">Kayıt Ol</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ps-section__right">
+                    <figure class="ps-section__desc">
+                        <figcaption>Bugün kayıt olun ve şunları yapabileceksiniz:</figcaption>
+                        <p>Alışveriş deneyiminizi kolaylaştırmak için hemen kayıt olun veya giriş yapın:</p>
+                        <ul class="ps-list">
+                            <li><i class="icon-credit-card"></i><span>HIZLI ÖDEME İŞLEMLERİ</span></li>
+                            <li><i class="icon-clipboard-check"></i><span>SİPARİŞLERİNİZİ KOLAYCA TAKİP EDİN</span></li>
+                            <li><i class="icon-bag2"></i><span>TÜM ALIŞ VERİŞLERİNİZİN KAYDI</span></li>
+                        </ul>
+                    </figure>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Reset Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">Şifremi Unuttum</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="ForgotPassword" asp-controller="Auth" method="post">
+                <div class="modal-body">
+                    <p>Lütfen hesabınıza kayıtlı e-posta adresinizi giriniz. Şifre sıfırlama bağlantısı e-posta adresinize gönderilecektir.</p>
+                    <div class="form-group">
+                        <input type="email" name="email" class="form-control" placeholder="E-posta adresiniz" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning" style="background-color: #fcb800; border-color: #fcb800; color: #fff;">Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Ensure modal works (Bootstrap 4 usually used in these templates, checking if specific init is needed)
+        // If the template uses a specific JS framework for modals, adjustments might be needed.
+        // Assuming standard Bootstrap behavior.
+    </script>
+}

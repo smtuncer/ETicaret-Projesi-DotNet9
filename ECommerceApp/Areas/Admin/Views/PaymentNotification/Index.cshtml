@@ -1,0 +1,183 @@
+@model IEnumerable<ECommerceApp.Models.PaymentNotification>
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Ödeme Bildirimleri</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Finans Yönetimi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card card-flush">
+                    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                        <div class="card-title">
+                            <h3>Bildirim Listesi</h3>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_products_table">
+                            <thead>
+                                <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                    <th>Tarih</th>
+                                    <th>Sipariş No</th>
+                                    <th>Kullanıcı</th>
+                                    <th>Gönderen</th>
+                                    <th>Tutar</th>
+                                    <th>Dekont</th>
+                                    <th>Not</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            @if (item.Order != null)
+                                            {
+                                                <span class="fw-bold">@item.Order.OrderNumber</span>
+                                                <br />
+                                                <small>Toplam: @item.Order.TotalAmount.ToString("N2") ₺</small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-danger">Sipariş Bulunamadı</span>
+                                            }
+                                        </td>
+                                        <td>@item.User?.Name @item.User?.Surname</td>
+                                        <td>@item.SenderName</td>
+                                        <td>@item.Amount.ToString("N2") ₺</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.ReceiptImageUrl))
+                                            {
+                                                <a href="@item.ReceiptImageUrl" target="_blank" class="btn btn-sm btn-light-primary">
+                                                    <i class="fas fa-file-invoice me-1"></i> Görüntüle
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>@item.Note</td>
+                                        <td>
+                                            @if (item.Status == ECommerceApp.Models.PaymentNotificationStatus.Pending)
+                                            {
+                                                <span class="badge badge-light-warning">Bekliyor</span>
+                                            }
+                                            else if (item.Status == ECommerceApp.Models.PaymentNotificationStatus.Approved)
+                                            {
+                                                <span class="badge badge-light-success">Onaylandı</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-light-danger">Reddedildi</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="d-flex">
+                                                @if (item.Status != ECommerceApp.Models.PaymentNotificationStatus.Approved)
+                                                {
+                                                    <form asp-action="Approve" asp-route-id="@item.Id" method="post" class="me-2">
+                                                        <button type="submit" class="btn btn-sm btn-light-success btn-active-success">Onayla</button>
+                                                    </form>
+                                                }
+                                                
+                                                @if (item.Status != ECommerceApp.Models.PaymentNotificationStatus.Rejected)
+                                                {
+                                                    <form asp-action="Reject" asp-route-id="@item.Id" method="post">
+                                                        <button type="submit" class="btn btn-sm btn-light-danger btn-active-danger">Reddet</button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    @{
+                        int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+                        int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+                        int windowSize = 5;
+                        int startPage = Math.Max(1, currentPage - 2);
+                        int endPage = Math.Min(totalPages, startPage + windowSize - 1);
+                        if (endPage - startPage < windowSize - 1)
+                        {
+                            startPage = Math.Max(1, endPage - windowSize + 1);
+                        }
+                    }
+
+                    @if (totalPages > 1)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mt-5 px-4 pb-4">
+                            <div class="text-muted">
+                                Sayfa @currentPage / @totalPages
+                            </div>
+                            <ul class="pagination">
+                                @if (currentPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)">Önceki</a>
+                                    </li>
+                                }
+
+                                @if (startPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-page="1">1</a>
+                                    </li>
+                                    @if (startPage > 2)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                }
+
+                                @for (int i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                                    </li>
+                                }
+
+                                @if (endPage < totalPages)
+                                {
+                                    if (endPage < totalPages - 1)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@totalPages">@totalPages</a>
+                                    </li>
+                                }
+
+                                @if (currentPage < totalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)">Sonraki</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

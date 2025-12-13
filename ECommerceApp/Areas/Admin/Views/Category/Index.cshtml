@@ -1,0 +1,436 @@
+@model IEnumerable<ECommerceApp.Models.Category>
+
+@{
+    ViewData["Title"] = "Kategoriler";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Kategoriler</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Kategoriler</li>
+                    </ul>
+                </div>
+            <div class="card-toolbar">
+                <button type="button" class="btn btn-sm btn-danger me-2" id="btnDeleteSelected" style="display:none;" onclick="submitDeleteForm()">
+                    <i class="bi bi-trash-fill fs-2"></i>Seçilenleri Sil
+                </button>
+                <a asp-action="ExportExcel" class="btn btn-sm btn-success me-2">
+                    <i class="bi bi-file-earmark-excel fs-2"></i>Excel İndir
+                </a>
+                <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#importExcelModal">
+                    <i class="bi bi-file-earmark-arrow-up fs-2"></i>Excel Yükle
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                    <i class="ki-duotone ki-plus fs-2"></i>Yeni Kategori
+                </button>
+            </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <!-- Search -->
+                <div class="card mb-5">
+                    <div class="card-body">
+                        <form method="get" asp-action="Index" class="row g-3">
+                            <div class="col-md-9">
+                                <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Kategori adı ara...">
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="ki-duotone ki-magnifier fs-2"></i>Ara
+                                </button>
+                                <a asp-action="Index" class="btn btn-light">Temizle</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-5 mb-xl-8">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">Toplam @ViewBag.TotalItems Kategori</span>
+                        </h3>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="table-responsive">
+                            <table class="table align-middle gs-0 gy-4">
+                                <thead>
+                                    <tr class="fw-bold text-muted bg-light">
+                                        <th class="ps-4 rounded-start w-10px">
+                                            <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                                <input class="form-check-input" type="checkbox" id="selectAll" value="1" />
+                                            </div>
+                                        </th>
+                                        <th>Kategori Adı</th>
+                                        <th>Ürün Sayısı</th>
+                                        <th>Üst Kategori</th>
+                                        <th>Sıra</th>
+                                        <th>Menüde?</th>
+                                        <th>Durum</th>
+                                        <th class="rounded-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                                    <input class="form-check-input" type="checkbox" name="ids" value="@item.Id" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    int depth = 0;
+                                                    if (ViewBag.CategoryDepths is Dictionary<int, int> depths && depths.TryGetValue(item.Id, out var d))
+                                                    {
+                                                        depth = d;
+                                                    }
+                                                }
+                                                <div style="padding-left: @(depth * 30)px">
+                                                    @if (depth > 0)
+                                                    {
+                                                        <span class="text-gray-400 me-2">
+                                                            <i class="ki-duotone ki-right-square fs-6"></i>
+                                                        </span>
+                                                    }
+                                                    <span class="text-dark fw-bold text-hover-primary mb-1 fs-6">@item.Name</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    int pCount = 0;
+                                                    if (ViewBag.ProductCounts is Dictionary<int, int> pCounts && pCounts.TryGetValue(item.Id, out var pc))
+                                                    {
+                                                        pCount = pc;
+                                                    }
+                                                }
+                                                <span class="badge badge-light-primary fw-bold">@pCount</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted fw-semibold d-block fs-7">@(item.Parent?.Name ?? "-")</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted fw-semibold d-block fs-7">@item.Order</span>
+                                            </td>
+                                            <td>
+                                                @if (item.ShowInMenu)
+                                                {
+                                                    <span class="badge badge-light-info">Evet</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light-secondary">Hayır</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (item.IsActive)
+                                                {
+                                                    <span class="badge badge-light-success">Aktif</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light-danger">Pasif</span>
+                                                }
+                                            </td>
+                                            <td class="text-end">
+                                                <button type="button" class="btn btn-success btn-sm px-4 me-2" data-bs-toggle="modal" data-bs-target="#editCategoryModal-@item.Id">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm px-4 me-2" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal-@item.Id">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+
+                                                <!-- Delete Modal -->
+                                                <div class="modal fade" id="deleteCategoryModal-@item.Id" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h2 class="fw-bold">Kategori Sil</h2>
+                                                                <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                                                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+                                                                <div class="text-center">
+                                                                    <i class="bi bi-exclamation-triangle text-warning fs-5x mb-5"></i>
+                                                                    <h3 class="fs-2 fw-bold mb-5">Emin misiniz?</h3>
+                                                                    <p class="text-gray-600 fs-5 mb-5">
+                                                                        <span class="fw-bold text-gray-900">@item.Name</span> kategorisini silmek istediğinize emin misiniz?
+                                                                        Bu işlem geri alınamaz.
+                                                                    </p>
+                                                                </div>
+                                                                <div class="text-center">
+                                                                    <button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">İptal</button>
+                                                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Evet, Sil</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Edit Modal -->
+                                                <div class="modal fade" id="editCategoryModal-@item.Id" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered mw-650px text-start">
+                                                        <div class="modal-content rounded">
+                                                            <div class="modal-header pb-0 border-0 justify-content-end">
+                                                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                                <form asp-action="Edit" method="post">
+                                                                    <input type="hidden" name="Id" value="@item.Id" />
+                                                                    <div class="mb-13 text-center">
+                                                                        <h1 class="mb-3">Kategori Düzenle</h1>
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span class="required">Kategori Adı</span>
+                                                                        </label>
+                                                                        <input type="text" class="form-control form-control-solid" name="Name" value="@item.Name" required />
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span>Üst Kategori</span>
+                                                                        </label>
+                                                                        <select name="ParentId" class="form-select form-select-solid" asp-items="@(new SelectList(ViewBag.ParentCategories, "Value", "Text", item.ParentId))">
+                                                                            <option value="">-- Yok --</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span>Açıklama</span>
+                                                                        </label>
+                                                                        <textarea class="form-control form-control-solid" name="Description" rows="3">@item.Description</textarea>
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                            <span>Sıra</span>
+                                                                        </label>
+                                                                        <input type="number" class="form-control form-control-solid" name="Order" value="@item.Order" />
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <div class="form-check form-check-solid form-switch fv-row">
+                                                                            <input class="form-check-input w-45px h-30px" type="checkbox" name="IsActive" value="true" @(item.IsActive ? "checked" : "") />
+                                                                            <label class="form-check-label">Aktif mi?</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <div class="form-check form-check-solid form-switch fv-row">
+                                                                            <input class="form-check-input w-45px h-30px" type="checkbox" name="ShowInMenu" value="true" @(item.ShowInMenu ? "checked" : "") />
+                                                                            <label class="form-check-label">Menüde Göster</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="d-flex flex-column mb-8 fv-row">
+                                                                        <div class="form-check form-check-solid form-switch fv-row">
+                                                                            <input class="form-check-input w-45px h-30px" type="checkbox" name="IsFeatured" value="true" @(item.IsFeatured ? "checked" : "") />
+                                                                            <label class="form-check-label">Anasayfada Göster (Ürünlerini Listele)</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="text-center">
+                                                                        <button type="reset" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                                                                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mt-5">
+                                <div class="text-muted">
+                                    Sayfa @ViewBag.CurrentPage / @ViewBag.TotalPages
+                                </div>
+                                <ul class="pagination">
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-search="@ViewBag.Search">Önceki</a>
+                                        </li>
+                                    }
+
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@ViewBag.Search">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-search="@ViewBag.Search">Sonraki</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="deleteForm" asp-action="DeleteSelected" method="post" style="display:none"></form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('input[name="ids"]');
+        const btnDeleteSelected = document.getElementById('btnDeleteSelected');
+
+        function updateButtonState() {
+            const anyChecked = Array.from(checkboxes).some(c => c.checked);
+            btnDeleteSelected.style.display = anyChecked ? 'inline-block' : 'none';
+        }
+
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(c => c.checked = selectAll.checked);
+            updateButtonState();
+        });
+
+        checkboxes.forEach(c => {
+            c.addEventListener('change', updateButtonState);
+        });
+    });
+
+    function submitDeleteForm() {
+        if (confirm('Seçili kategorileri ve bu kategorilere ait TÜM ÜRÜNLERİ silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+            const form = document.getElementById('deleteForm');
+            // Remove old inputs if any
+            const oldInputs = form.querySelectorAll('input[name="ids"]');
+            oldInputs.forEach(i => i.remove());
+
+            const checkboxes = document.querySelectorAll('input[name="ids"]:checked');
+            checkboxes.forEach(c => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ids';
+                input.value = c.value;
+                form.appendChild(input);
+            });
+            form.submit();
+        }
+    }
+</script>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content rounded">
+            <div class="modal-header pb-0 border-0 justify-content-end">
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="ki-duotone ki-cross fs-1"></i>
+                </div>
+            </div>
+            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                <form asp-action="Create" method="post">
+                    <div class="mb-13 text-center">
+                        <h1 class="mb-3">Yeni Kategori Ekle</h1>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Kategori Adı</span>
+                        </label>
+                        <input type="text" class="form-control form-control-solid" name="Name" required />
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span>Üst Kategori</span>
+                        </label>
+                        <select name="ParentId" class="form-select form-select-solid" asp-items="ViewBag.ParentCategories">
+                            <option value="">-- Yok --</option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span>Açıklama</span>
+                        </label>
+                        <textarea class="form-control form-control-solid" name="Description" rows="3"></textarea>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span>Sıra</span>
+                        </label>
+                        <input type="number" class="form-control form-control-solid" name="Order" value="0" />
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <div class="form-check form-check-solid form-switch fv-row">
+                            <input class="form-check-input w-45px h-30px" type="checkbox" name="IsActive" value="true" checked />
+                            <label class="form-check-label">Aktif mi?</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <div class="form-check form-check-solid form-switch fv-row">
+                            <input class="form-check-input w-45px h-30px" type="checkbox" name="ShowInMenu" value="true" />
+                            <label class="form-check-label">Menüde Göster</label>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <div class="form-check form-check-solid form-switch fv-row">
+                            <input class="form-check-input w-45px h-30px" type="checkbox" name="IsFeatured" value="true" />
+                            <label class="form-check-label">Anasayfada Göster (Ürünlerini Listele)</label>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="reset" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+
+<!-- Import Excel Modal -->
+<div class="modal fade" id="importExcelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content rounded">
+            <div class="modal-header pb-0 border-0 justify-content-end">
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="ki-duotone ki-cross fs-1"></i>
+                </div>
+            </div>
+            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                <form asp-action="ImportExcel" method="post" enctype="multipart/form-data">
+                    <div class="mb-13 text-center">
+                        <h1 class="mb-3">Excel'den Kategori Yükle</h1>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Excel Dosyası</span>
+                        </label>
+                        <input type="file" class="form-control form-control-solid" name="excelFile" accept=".xlsx" required />
+                    </div>
+                    <div class="text-center">
+                        <button type="reset" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                        <button type="submit" class="btn btn-primary">Yükle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

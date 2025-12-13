@@ -1,0 +1,74 @@
+@model ECommerceApp.Models.SiteSettings
+
+@{
+    ViewData["Title"] = "Site Ayarları";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Site Ayarları</h1>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success d-flex align-items-center p-5 mb-5">
+                        <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4"><span class="path1"></span><span class="path2"></span></i>
+                        <div class="d-flex flex-column">
+                            <h4 class="mb-1 text-success">Başarılı</h4>
+                            <span>@TempData["SuccessMessage"]</span>
+                        </div>
+                    </div>
+                }
+
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="Update" method="post">
+                            <input type="hidden" asp-for="Id" />
+                            
+                            <h3 class="mb-4">Kargo ve Vergi Ayarları</h3>
+                            <div class="row mb-5">
+                                <div class="col-md-4">
+                                    <label asp-for="VatRate" class="form-label required">KDV Oranı (%)</label>
+                                    <input asp-for="VatRate" class="form-control" type="number" step="0.01" />
+                                    <span asp-validation-for="VatRate" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="ShippingFee" class="form-label required">Standart Kargo Ücreti (₺)</label>
+                                    <input asp-for="ShippingFee" class="form-control" type="number" step="0.01" />
+                                    <span asp-validation-for="ShippingFee" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="FreeShippingThreshold" class="form-label">Ücretsiz Kargo Limiti (₺)</label>
+                                    <input asp-for="FreeShippingThreshold" class="form-control" type="number" step="0.01" />
+                                    <span asp-validation-for="FreeShippingThreshold" class="text-danger"></span>
+                                    <div class="form-text">Sepet tutarı bu limitin üzerindeyse kargo ücretsiz olur. Boş bırakırsanız her zaman ücretli olur.</div>
+                                </div>
+                            </div>
+
+                            <h3 class="mb-4">İletişim Ayarları</h3>
+                            <div class="row mb-5">
+                                <div class="col-md-6">
+                                    <label asp-for="ContactEmail" class="form-label required">İletişim E-Posta (Bildirimler buraya gönderilir)</label>
+                                    <input asp-for="ContactEmail" class="form-control" type="email" />
+                                    <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

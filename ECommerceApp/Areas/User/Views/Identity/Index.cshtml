@@ -1,0 +1,153 @@
+﻿@model ECommerceApp.Models.User
+
+@{
+    ViewData["Title"] = "Profil Bilgileri";
+}
+
+<div class="ps-page--my-account bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <partial name="_ProfileSidebar" />
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                        <h3 class="mb-0 fw-bold text-dark">Kişisel Bilgiler</h3>
+                        <p class="text-muted small mt-1">Hesap bilgilerinizi buradan güncelleyebilirsiniz.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success d-flex align-items-center shadow-sm border-0 mb-4">
+                                <i class="icon-checkmark-circle fs-4 me-2"></i>
+                                <div>@TempData["SuccessMessage"]</div>
+                            </div>
+                        }
+
+                        <form asp-action="UpdateProfile" method="post" class="needs-validation">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" asp-for="Name" id="floatingName" placeholder="Adınız" />
+                                        <label for="floatingName" class="text-muted">Adınız</label>
+                                        <span asp-validation-for="Name" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" asp-for="Surname" id="floatingSurname" placeholder="Soyadınız" />
+                                        <label for="floatingSurname" class="text-muted">Soyadınız</label>
+                                        <span asp-validation-for="Surname" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" asp-for="PhoneNumber" id="floatingPhone" placeholder="Telefon Numaranız" />
+                                        <label for="floatingPhone" class="text-muted">Telefon Numarası</label>
+                                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="text" asp-for="IdentityNumber" id="floatingIdentityNumber" placeholder="TC Kimlik No" maxlength="11" />
+                                        <label for="floatingIdentityNumber" class="text-muted">TC Kimlik No</label>
+                                        <span asp-validation-for="IdentityNumber" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="email" asp-for="Email" id="floatingEmail" placeholder="E-posta" />
+                                        <label for="floatingEmail" class="text-muted">E-posta Adresi</label>
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-2 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow-sm">
+                                    Bilgileri Güncelle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Change Password Section -->
+                <div class="card border-0 shadow-sm rounded-3 mt-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                        <h3 class="mb-0 fw-bold text-dark">Şifre Değiştir</h3>
+                        <p class="text-muted small mt-1">Hesap güvenliğiniz için şifrenizi güncelleyebilirsiniz.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger d-flex align-items-center shadow-sm border-0 mb-4">
+                                <i class="icon-cross-circle fs-4 me-2"></i>
+                                <div>@TempData["ErrorMessage"]</div>
+                            </div>
+                        }
+
+                        <form asp-action="ChangePassword" method="post">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="password" name="CurrentPassword" id="CurrentPassword" placeholder="Mevcut Şifre" required />
+                                        <label for="CurrentPassword" class="text-muted">Mevcut Şifre</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="password" name="NewPassword" id="NewPassword" placeholder="Yeni Şifre" required />
+                                        <label for="NewPassword" class="text-muted">Yeni Şifre</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input class="form-control" type="password" name="ConfirmNewPassword" id="ConfirmNewPassword" placeholder="Yeni Şifre Tekrar" required />
+                                        <label for="ConfirmNewPassword" class="text-muted">Yeni Şifre Tekrar</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-2 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-warning btn-lg px-5 rounded-pill fw-bold shadow-sm" style="background-color: #fcb800; border-color: #fcb800; color: #fff;">
+                                    Şifreyi Güncelle
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-floating > .form-control {
+        border: 1px solid #eee;
+        border-radius: 10px;
+        height: 58px; /* Yükseklik artırıldı */
+        line-height: 1.25;
+    }
+    
+    .form-floating > label {
+        padding: 1rem 0.75rem;
+    }
+
+    .form-floating > .form-control:focus {
+        border-color: #C5A059;
+        box-shadow: 0 0 0 0.25rem rgba(252, 184, 0, 0.15);
+    }
+    .btn-primary {
+        background-color: #C5A059;
+        border-color: #C5A059;
+        color: #222;
+    }
+    .btn-primary:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #000;
+    }
+</style>

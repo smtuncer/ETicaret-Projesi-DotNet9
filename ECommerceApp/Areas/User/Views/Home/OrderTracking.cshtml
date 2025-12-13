@@ -1,0 +1,326 @@
+﻿@model ECommerceApp.Models.Order
+@{
+    ViewData["Title"] = "Sipariş Takibi";
+}
+
+<div class="ps-page--simple">
+    <div class="ps-order-tracking">
+        <div class="container">
+            <div class="ps-section__header">
+                <h3>Sipariş Takibi</h3>
+                <p>Siparişinizi takip etmek için lütfen aşağıdaki kutuya Sipariş Numaranızı girin ve "Sorgula" düğmesine basın. Bu numara size makbuzunuzda ve onay e-postasında verilmiştir.</p>
+            </div>
+            <div class="ps-section__content">
+                <form class="ps-form--order-tracking" asp-action="OrderTracking" method="get">
+                    <div class="form-group">
+                        <label>Sipariş Numarası</label>
+                        <input class="form-control" type="text" name="orderNumber" value="@Context.Request.Query["orderNumber"]" placeholder="Sipariş onay e-postasında bulunur (Örn: ORD-2023...)">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="ps-btn ps-btn--fullwidth">Sorgula</button>
+                    </div>
+                </form>
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-warning mt-4">
+                        @ViewBag.ErrorMessage
+                    </div>
+                }
+
+                @if (Model != null)
+                {
+                    <div class="mt-5">
+                        <!-- Order Summary Card -->
+                        <div class="card border-0 shadow-sm rounded-3 mb-4">
+                            <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold text-dark">Sipariş No: #@Model.OrderNumber</h5>
+                                        <p class="text-muted small mb-0">@Model.OrderDate.ToString("dd MMMM yyyy HH:mm")</p>
+                                    </div>
+                                    <div class="mt-2 mt-sm-0">
+                                        @if (Model.Status == ECommerceApp.Models.OrderStatus.Pending)
+                                        {
+                                            <span class="badge bg-soft-warning text-warning rounded-pill px-3 py-2 fs-6">Beklemede</span>
+                                        }
+                                        else if (Model.Status == ECommerceApp.Models.OrderStatus.Approved)
+                                        {
+                                            <span class="badge bg-soft-success text-success rounded-pill px-3 py-2 fs-6">Onaylandı</span>
+                                        }
+                                        else if (Model.Status == ECommerceApp.Models.OrderStatus.Shipped)
+                                        {
+                                            <span class="badge bg-soft-info text-info rounded-pill px-3 py-2 fs-6">Kargolandı</span>
+                                        }
+                                        else if (Model.Status == ECommerceApp.Models.OrderStatus.Delivered)
+                                        {
+                                            <span class="badge bg-soft-success text-success rounded-pill px-3 py-2 fs-6">Teslim Edildi</span>
+                                        }
+                                        else if (Model.Status == ECommerceApp.Models.OrderStatus.Cancelled)
+                                        {
+                                            <span class="badge bg-soft-danger text-danger rounded-pill px-3 py-2 fs-6">İptal Edildi</span>
+                                        }
+                                        else if (Model.Status == ECommerceApp.Models.OrderStatus.Refunded)
+                                        {
+                                            <span class="badge bg-soft-secondary text-secondary rounded-pill px-3 py-2 fs-6">İade Edildi</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-4">
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-light rounded-3 h-100 border border-dashed">
+                                            <h6 class="fw-bold text-dark mb-3"><i class="icon-map-marker me-2 text-primary"></i>Teslimat Adresi</h6>
+                                            <p class="mb-1 fw-medium text-dark">@Model.ShippingAddressTitle</p>
+                                            <p class="text-muted small mb-0">
+                                                @Model.ShippingAddressDetail <br />
+                                                @Model.ShippingAddressDistrict / @Model.ShippingAddressCity <br />
+                                                @Model.ShippingZipCode
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-light rounded-3 h-100 border border-dashed">
+                                            <h6 class="fw-bold text-dark mb-3"><i class="icon-receipt me-2 text-primary"></i>Fatura Adresi</h6>
+                                            @if (!string.IsNullOrEmpty(Model.BillingAddressTitle))
+                                            {
+                                                <p class="mb-1 fw-medium text-dark">@Model.BillingAddressTitle</p>
+                                                <p class="text-muted small mb-0">
+                                                    @Model.BillingAddressDetail <br />
+                                                    @Model.BillingAddressDistrict / @Model.BillingAddressCity <br />
+                                                    @Model.BillingZipCode
+                                                </p>
+                                                @if (!string.IsNullOrEmpty(Model.BillingCompanyName))
+                                                {
+                                                    <div class="mt-2 border-top pt-2">
+                                                        <small class="d-block text-muted"><strong>Kurumsal:</strong></small>
+                                                        <small class="d-block text-dark">@Model.BillingCompanyName</small>
+                                                        <small class="d-block text-muted">@Model.BillingTaxOffice / @Model.BillingTaxNumber</small>
+                                                    </div>
+                                                }
+                                                else if (!string.IsNullOrEmpty(Model.BillingIdentityNumber))
+                                                {
+                                                     <div class="mt-2 border-top pt-2">
+                                                        <small class="d-block text-muted"><strong>Bireysel:</strong></small>
+                                                        <small class="d-block text-dark">TCKN: @Model.BillingIdentityNumber</small>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                 <p class="text-muted small">Bu sipariş için ayrı fatura adresi kaydedilmemiştir.</p>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-light rounded-3 h-100 border border-dashed">
+                                            <h6 class="fw-bold text-dark mb-3"><i class="icon-credit-card me-2 text-primary"></i>Ödeme Bilgileri</h6>
+                                            <p class="mb-2">
+                                                <span class="text-muted small">Ödeme Yöntemi:</span>
+                                                <span class="fw-medium text-dark ms-1">
+                                                    @(Model.PaymentMethod == ECommerceApp.Models.PaymentMethod.CreditCard ? "Kredi Kartı" : "Havale/EFT")
+                                                </span>
+                                            </p>
+                                            <p class="mb-0">
+                                                <span class="text-muted small">Toplam Tutar:</span>
+                                                <span class="fw-bold text-primary ms-1 fs-5">@Model.TotalAmount.ToString("N2") ₺</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Items -->
+                        <div class="card border-0 shadow-sm rounded-3 mb-4">
+                            <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                                <h5 class="mb-0 fw-bold text-dark">Sipariş İçeriği</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="table-responsive">
+                                    <table class="table align-middle">
+                                        <thead class="bg-light text-muted small text-uppercase">
+                                            <tr>
+                                                <th class="py-3 ps-4 rounded-start">Ürün</th>
+                                                <th class="py-3">Fiyat</th>
+                                                <th class="py-3">Adet</th>
+                                                <th class="py-3 pe-4 rounded-end text-end">Toplam</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="border-0">
+                                            @foreach (var item in Model.Items)
+                                            {
+                                                <tr>
+                                                    <td class="ps-4">
+                                                        <div class="d-flex align-items-center">
+                                                            @if (item.Product?.Images != null && item.Product.Images.Any())
+                                                            {
+                                                                <div class="me-3 rounded overflow-hidden" style="width: 60px; height: 60px;">
+                                                                    <img src="@item.Product.Images.First().ImageUrl" alt="@item.ProductName" class="w-100 h-100 object-fit-cover" />
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="me-3 rounded overflow-hidden bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                                                    <i class="icon-picture text-muted"></i>
+                                                                </div>
+                                                            }
+                                                            <div>
+                                                                <h6 class="mb-0 text-dark fw-medium">@item.ProductName</h6>
+                                                                <small class="text-muted">Kod: @(item.Product?.Id ?? 0)</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-muted">
+                                                        @item.Price.ToString("N2") ₺
+                                                        <br />
+                                                        <small class="text-muted" style="font-size: 11px;">+ %@item.VatRate.ToString("0") KDV (@((item.VatAmount / item.Quantity).ToString("N2")) ₺)</small>
+                                                    </td>
+                                                    <td class="text-muted">@item.Quantity</td>
+                                                    <td class="fw-bold text-dark text-end pe-4">@((item.Price * item.Quantity + item.VatAmount).ToString("N2")) ₺</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot class="border-top">
+                                            <tr>
+                                                <td colspan="3" class="text-end pt-3 pb-0 text-muted small">Ara Toplam (KDV Hariç)</td>
+                                                <td class="text-end pt-3 pb-0 text-dark fw-medium pe-4">@Model.SubTotalWithoutVat.ToString("N2") ₺</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="text-end pt-2 pb-0 text-muted small">Toplam KDV</td>
+                                                <td class="text-end pt-2 pb-0 text-dark fw-medium pe-4">+@Model.VatAmount.ToString("N2") ₺</td>
+                                            </tr>
+                                            @if (!string.IsNullOrEmpty(Model.CouponCode))
+                                            {
+                                                <tr>
+                                                    <td colspan="3" class="text-end pt-2 pb-0 text-success small">
+                                                        <i class="icon-tag me-1"></i>İndirim Kodu (@Model.CouponCode)
+                                                    </td>
+                                                    <td class="text-end pt-2 pb-0 text-success fw-bold pe-4">-@Model.DiscountAmount?.ToString("N2") ₺</td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <td colspan="3" class="text-end pt-3 pb-0 text-muted small">Kargo Ücreti</td>
+                                                <td class="text-end pt-3 pb-0 text-dark fw-medium pe-4">@(Model.ShippingFee == 0 ? "Ücretsiz" : "+" + Model.ShippingFee.ToString("N2") + " ₺")</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="text-end pt-4 pb-0 text-muted small text-uppercase">Genel Toplam</td>
+                                                <td class="text-end pt-4 pb-0 fw-bold text-primary fs-4 pe-4">@Model.TotalAmount.ToString("N2") ₺</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kargo Notu -->
+                        @if (!string.IsNullOrEmpty(Model.ShippingNote))
+                        {
+                            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                                    <h5 class="mb-0 fw-bold text-dark"><i class="icon-truck me-2 text-primary"></i>Kargo Bilgisi</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="alert alert-info d-flex align-items-start p-4 mb-0 border-0 shadow-sm">
+                                        <i class="icon-information fs-3 text-info me-3 mt-1"></i>
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-bold mb-2">Kargo Notu</h6>
+                                            <p class="mb-2">@Model.ShippingNote</p>
+                                            @if (Model.ShippingNoteDate.HasValue)
+                                            {
+                                                <small class="text-muted">
+                                                    <i class="icon-calendar me-1"></i>
+                                                    @Model.ShippingNoteDate.Value.ToString("dd MMMM yyyy HH:mm", new System.Globalization.CultureInfo("tr-TR"))
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Payment Notifications (If Havale/EFT) -->
+                        @if (Model.PaymentNotifications != null && Model.PaymentNotifications.Any())
+                        {
+                            <div class="card border-0 shadow-sm rounded-3">
+                                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                                    <h5 class="mb-0 fw-bold text-dark">Ödeme Bildirimleri</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover">
+                                            <thead class="bg-light text-muted small text-uppercase">
+                                                <tr>
+                                                    <th class="py-3 ps-4 rounded-start">Tarih</th>
+                                                    <th class="py-3">Gönderen</th>
+                                                    <th class="py-3">Tutar</th>
+                                                    <th class="py-3">Not</th>
+                                                    <th class="py-3 pe-4 rounded-end">Durum</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="border-0">
+                                                @foreach (var notif in Model.PaymentNotifications)
+                                                {
+                                                    <tr>
+                                                        <td class="ps-4 text-muted small">@notif.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                                        <td class="fw-medium text-dark">@notif.SenderName</td>
+                                                        <td class="text-dark">@notif.Amount.ToString("N2") ₺</td>
+                                                        <td class="text-muted small">@notif.Note</td>
+                                                        <td class="pe-4">
+                                                            @if (notif.Status == ECommerceApp.Models.PaymentNotificationStatus.Pending)
+                                                            {
+                                                                <span class="badge bg-soft-warning text-warning rounded-pill px-2">Beklemede</span>
+                                                            }
+                                                            else if (notif.Status == ECommerceApp.Models.PaymentNotificationStatus.Approved)
+                                                            {
+                                                                <span class="badge bg-soft-success text-success rounded-pill px-2">Onaylandı</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge bg-soft-danger text-danger rounded-pill px-2">Reddedildi</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-soft-primary { background-color: rgba(252, 184, 0, 0.1); }
+    .text-primary { color: #C5A059 !important; }
+    
+    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); }
+    .text-warning { color: #ffc107 !important; }
+    
+    .bg-soft-success { background-color: rgba(25, 135, 84, 0.1); }
+    .text-success { color: #198754 !important; }
+    
+    .bg-soft-info { background-color: rgba(13, 202, 240, 0.1); }
+    .text-info { color: #0dcaf0 !important; }
+    
+    .bg-soft-danger { background-color: rgba(220, 53, 69, 0.1); }
+    .text-danger { color: #dc3545 !important; }
+    
+    .bg-soft-secondary { background-color: rgba(108, 117, 125, 0.1); }
+    .text-secondary { color: #6c757d !important; }
+
+    .border-dashed { border-style: dashed !important; }
+    
+    .object-fit-cover { object-fit: cover; }
+    
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.5rem;
+        border-bottom-color: #f5f5f5;
+    }
+</style>

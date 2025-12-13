@@ -1,0 +1,203 @@
+@model List<ECommerceApp.Models.PaymentNotification>
+
+@{
+    ViewData["Title"] = "Ödeme Bildirimlerim";
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+}
+
+<div class="ps-page--my-account bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <partial name="_ProfileSidebar" />
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="mb-0 fw-bold text-dark">Ödeme Bildirimlerim</h3>
+                                <p class="text-muted small mt-1 mb-0">Havale/EFT ödeme bildirimlerinizi görüntüleyin.</p>
+                            </div>
+                            <a href="@Url.Action("CreatePaymentNotification")" class="btn btn-primary btn-sm rounded-pill">
+                                <i class="icon-plus me-1"></i> Yeni Bildirim
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success border-0 shadow-sm mb-4">
+                                <i class="icon-check me-2"></i> @TempData["SuccessMessage"]
+                            </div>
+                        }
+
+                        @if (Model != null && Model.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var notification in Model.OrderByDescending(n => n.NotificationDate))
+                                {
+                                    <div class="col-md-6 col-12">
+                                        <div class="card border shadow-sm rounded-3 h-100">
+                                            <div class="card-body p-4">
+                                                <div class="row g-3">
+                                                    <div class="col-12">
+                                                        <div class="d-flex align-items-start">
+                                                            <div class="flex-shrink-0">
+                                                                <div class="bg-light rounded-circle p-3">
+                                                                    <i class="icon-credit-card fs-4 text-primary"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex-grow-1 ms-3">
+                                                                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                                                                    <h5 class="mb-0">#@notification.Id</h5>
+                                                                    @if (notification.Status == PaymentNotificationStatus.Pending)
+                                                                    {
+                                                                        <span class="badge bg-warning text-dark">
+                                                                            <i class="icon-clock me-1"></i> Beklemede
+                                                                        </span>
+                                                                    }
+                                                                    else if (notification.Status == PaymentNotificationStatus.Approved)
+                                                                    {
+                                                                        <span class="badge bg-success">
+                                                                            <i class="icon-check me-1"></i> Onaylandı
+                                                                        </span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="badge bg-danger">
+                                                                            <i class="icon-close me-1"></i> Reddedildi
+                                                                        </span>
+                                                                    }
+                                                                </div>
+                                                                <p class="mb-1">
+                                                                    <strong>Gönderen:</strong> @notification.SenderName
+                                                                </p>
+                                                                <p class="mb-1">
+                                                                    <strong>Tutar:</strong> <span class="text-success fw-bold">@notification.Amount.ToString("N2") ₺</span>
+                                                                </p>
+                                                                @if (notification.Order != null)
+                                                                {
+                                                                    <p class="mb-1">
+                                                                        <strong>Sipariş:</strong> @notification.Order.OrderNumber
+                                                                    </p>
+                                                                }
+                                                                @if (!string.IsNullOrEmpty(notification.Description))
+                                                                {
+                                                                    <p class="mb-1 text-muted">
+                                                                        <small>@notification.Description</small>
+                                                                    </p>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 mt-2">
+                                                        <hr class="my-2 text-muted opacity-25" />
+                                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                                            <div class="text-muted small">
+                                                                <i class="icon-calendar me-1"></i>
+                                                                @notification.NotificationDate.ToString("dd.MM.yyyy HH:mm")
+                                                            </div>
+                                                            @if (!string.IsNullOrEmpty(notification.ReceiptImageUrl))
+                                                            {
+                                                                <a href="@notification.ReceiptImageUrl" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill">
+                                                                    <i class="icon-eye me-1"></i> Dekont
+                                                                </a>
+                                                            }
+                                                        </div>
+
+                                                        @if (notification.Status == PaymentNotificationStatus.Approved && notification.ApprovedDate.HasValue)
+                                                        {
+                                                            <div class="mt-2 text-success small">
+                                                                <i class="icon-check me-1"></i> Onay:
+                                                                @notification.ApprovedDate.Value.ToString("dd.MM.yyyy HH:mm")
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(notification.AdminNote))
+                                                        {
+                                                            <div class="alert alert-info mt-2 mb-0 p-2">
+                                                                <small><strong>Not:</strong> @notification.AdminNote</small>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Pagination -->
+
+
+                            @if (totalPages > 1)
+                            {
+                                <div class="d-flex justify-content-center mt-4">
+                                    <ul class="pagination">
+                                        @if (currentPage > 1)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-action="PaymentNotifications" asp-route-page="@(currentPage - 1)">«</a>
+                                            </li>
+                                        }
+
+                                        @for (int i = 1; i <= totalPages; i++)
+                                        {
+                                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                                <a class="page-link" asp-action="PaymentNotifications" asp-route-page="@i">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (currentPage < totalPages)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" asp-action="PaymentNotifications" asp-route-page="@(currentPage + 1)">»</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 bg-light rounded-3 border border-dashed">
+                                <i class="icon-credit-card fs-1 text-muted mb-3 opacity-50"></i>
+                                <p class="text-muted mb-3">Henüz ödeme bildiriminiz bulunmuyor.</p>
+                                <a href="@Url.Action("CreatePaymentNotification")" class="btn btn-primary rounded-pill">
+                                    <i class="icon-plus me-1"></i> İlk Bildiriminizi Oluşturun
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-primary {
+        background-color: #C5A059;
+        border-color: #C5A059;
+    }
+    .btn-primary:hover {
+        background-color: #b08f4a;
+        border-color: #b08f4a;
+    }
+    .btn-outline-primary {
+        color: #C5A059;
+        border-color: #C5A059;
+    }
+    .btn-outline-primary:hover {
+        background-color: #C5A059;
+        border-color: #C5A059;
+        color: #fff;
+    }
+    .text-primary {
+        color: #C5A059 !important;
+    }
+    .border-dashed {
+        border-style: dashed !important;
+    }
+</style>

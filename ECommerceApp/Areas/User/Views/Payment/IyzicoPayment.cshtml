@@ -1,0 +1,25 @@
+@model ECommerceApp.Models.Order
+@{
+    ViewData["Title"] = "Iyzico Ödeme";
+    Layout = "_Layout";
+}
+
+<div class="ps-section--shopping ps-shopping-cart">
+    <div class="container">
+        <div class="ps-section__header">
+            <h1>Ödeme (Iyzico)</h1>
+        </div>
+        <div class="ps-section__content">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>Ödeme sayfasına yönlendiriliyorsunuz, lütfen bekleyiniz...</p>
+                    <div id="iyzipay-checkout-form" class="responsive"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Html.Raw(ViewBag.CheckoutFormScript)
+}

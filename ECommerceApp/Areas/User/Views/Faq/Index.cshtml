@@ -1,0 +1,41 @@
+﻿@model IEnumerable<ECommerceApp.Models.Faq>
+
+@{
+    ViewData["Title"] = "Sıkça Sorulan Sorular";
+}
+
+<div class="ps-page--single">
+    <div class="ps-faqs">
+        <div class="container">
+            <div class="ps-section__header">
+                <h1>Sıkça Sorulan Sorular</h1>
+            </div>
+            <div class="ps-section__content">
+                <div class="table-responsive">
+                    <table class="table ps-table--faqs">
+                        <tbody>
+                            @foreach (var group in Model.GroupBy(f => f.Category))
+                            {
+                                var firstItem = true;
+                                @foreach (var item in group)
+                                {
+                                    <tr>
+                                        @if (firstItem)
+                                        {
+                                            <td class="heading" rowspan="@group.Count()">
+                                                <h4>@group.Key</h4>
+                                            </td>
+                                            firstItem = false;
+                                        }
+                                        <td class="question">@item.Question</td>
+                                        <td>@item.Answer</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

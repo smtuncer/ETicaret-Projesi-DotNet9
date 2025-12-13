@@ -1,0 +1,206 @@
+@model ECommerceApp.Models.PaymentNotification
+
+@{
+    ViewData["Title"] = "Yeni Ödeme Bildirimi";
+    var bankAccounts = ViewBag.BankAccounts as List<ECommerceApp.Models.BankAccount>;
+    var userOrders = ViewBag.UserOrders as List<ECommerceApp.Models.Order>;
+}
+
+<div class="ps-page--my-account bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <partial name="_ProfileSidebar" />
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="mb-0 fw-bold text-dark">Havale / EFT Ödeme Bildirimi</h3>
+                                <p class="text-muted small mt-1 mb-0">Ödeme yaptıktan sonra bildirim oluşturun.</p>
+                            </div>
+                            <a href="@Url.Action("PaymentNotifications")" class="btn btn-outline-secondary btn-sm rounded-pill">
+                                <i class="icon-arrow-left me-1"></i> Geri Dön
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                                <i class="icon-warning me-2"></i> @TempData["ErrorMessage"]
+                            </div>
+                        }
+
+                        <div class="row">
+                            <!-- Sol Taraf - Banka Hesapları -->
+                            <div class="col-md-5 mb-4">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <h5 class="fw-bold mb-3">
+                                            <i class="icon-briefcase me-2 text-primary"></i>
+                                            Banka Hesaplarımız
+                                        </h5>
+                                        <p class="text-muted small mb-3">
+                                            Lütfen ödemenizi aşağıdaki hesaplardan birine yapınız ve ardından sağdaki formu doldurunuz.
+                                        </p>
+
+                                        @if (bankAccounts != null && bankAccounts.Any())
+                                        {
+                                            @foreach (var account in bankAccounts)
+                                            {
+                                                <div class="card mb-3 border">
+                                                    <div class="card-body p-3">
+                                                        <h6 class="fw-bold mb-2">@account.BankName</h6>
+                                                        <p class="mb-1 small">
+                                                            <strong>Hesap Sahibi:</strong><br>
+                                                            @account.AccountHolder
+                                                        </p>
+                                                        <p class="mb-1 small">
+                                                            <strong>IBAN:</strong><br>
+                                                            <code class="bg-white p-1 rounded">@account.IBAN</code>
+                                                        </p>
+                                                        @if (!string.IsNullOrEmpty(account.AccountNumber))
+                                                        {
+                                                            <p class="mb-0 small">
+                                                                <strong>Hesap No:</strong> @account.AccountNumber
+                                                            </p>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="alert alert-warning">
+                                                Banka hesap bilgileri yükleniyor...
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sağ Taraf - Ödeme Bildirimi Formu -->
+                            <div class="col-md-7">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="fw-bold mb-4">Ödeme Bildirim Formu</h5>
+
+                                        <form asp-action="CreatePaymentNotification" method="post" enctype="multipart/form-data">
+                                            <div class="mb-3">
+                                                <label asp-for="SenderName" class="form-label fw-bold">
+                                                    Gönderen Ad Soyad <sup class="text-danger">*</sup>
+                                                </label>
+                                                <input asp-for="SenderName" class="form-control" placeholder="Havale/EFT yapan kişinin adı" required>
+                                                <span asp-validation-for="SenderName" class="text-danger"></span>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label asp-for="Amount" class="form-label fw-bold">
+                                                    Gönderilen Tutar <sup class="text-danger">*</sup>
+                                                </label>
+                                                <div class="input-group">
+                                                    <input asp-for="Amount" type="number" step="0.01" class="form-control" placeholder="0.00" required>
+                                                    <span class="input-group-text">₺</span>
+                                                </div>
+                                                <small class="text-muted">Lütfen tam tutarı giriniz.</small>
+                                                <span asp-validation-for="Amount" class="text-danger d-block"></span>
+                                            </div>
+
+                                            @if (userOrders != null && userOrders.Any())
+                                            {
+                                                <div class="mb-3">
+                                                    <label asp-for="OrderId" class="form-label fw-bold">
+                                                        İlgili Sipariş (Opsiyonel)
+                                                    </label>
+                                                    <select asp-for="OrderId" class="form-select">
+                                                        <option value="">Sipariş seçiniz...</option>
+                                                        @foreach (var order in userOrders)
+                                                        {
+                                                            <option value="@order.Id">
+                                                                @order.OrderNumber - @order.TotalAmount.ToString("N2") ₺ (@order.OrderDate.ToString("dd.MM.yyyy"))
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                    <small class="text-muted">Ödeme bir siparişe aitse seçiniz.</small>
+                                                </div>
+                                            }
+
+                                            <div class="mb-3">
+                                                <label asp-for="Description" class="form-label fw-bold">
+                                                    Açıklama / Not
+                                                </label>
+                                                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Varsa işlem numarası buraya yazılabilirsiniz..."></textarea>
+                                                <span asp-validation-for="Description" class="text-danger"></span>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label fw-bold">
+                                                    Dekont / Makbuz Yükle
+                                                </label>
+                                                <input type="file" name="receiptImage" class="form-control" accept="image/*,.pdf">
+                                                <small class="text-muted">
+                                                    Ödeme dekontunuzu veya makbuzunuzu yükleyiniz. (JPG, PNG, PDF)
+                                                </small>
+                                            </div>
+
+                                            <div class="alert alert-info border-0">
+                                                <i class="icon-information me-2"></i>
+                                                <small>
+                                                    Bildiriminiz admin onayından sonra işleme alınacaktır. 
+                                                    Onay süreci genellikle 1-2 iş günü sürmektedir.
+                                                </small>
+                                            </div>
+
+                                            <div class="d-grid gap-2">
+                                                <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">
+                                                    <i class="icon-check me-2"></i>
+                                                    Bildirimi Gönder
+                                                </button>
+                                                <a href="@Url.Action("PaymentNotifications")" class="btn btn-outline-secondary rounded-pill">
+                                                    İptal
+                                                </a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .btn-primary {
+        background-color: #C5A059;
+        border-color: #C5A059;
+    }
+    .btn-primary:hover {
+        background-color: #b08f4a;
+        border-color: #b08f4a;
+    }
+    .btn-outline-primary {
+        color: #C5A059;
+        border-color: #C5A059;
+    }
+    .btn-outline-primary:hover {
+        background-color: #C5A059;
+        border-color: #C5A059;
+        color: #fff;
+    }
+    .text-primary {
+        color: #C5A059 !important;
+    }
+    code {
+        font-size: 0.9em;
+        word-break: break-all;
+    }
+</style>

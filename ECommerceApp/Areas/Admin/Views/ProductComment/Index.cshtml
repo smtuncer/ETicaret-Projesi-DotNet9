@@ -1,0 +1,234 @@
+@model List<ECommerceApp.Models.ProductComment>
+@{
+    ViewData["Title"] = "Ürün Yorumları";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Ürün Yorumları</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Ürün Yorumları</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                <!-- Filter -->
+                <div class="card mb-5">
+                    <div class="card-body">
+                        <form asp-action="Index" method="get" class="row g-3 align-items-center">
+                            <div class="col-auto">
+                                <label class="col-form-label">Durum:</label>
+                            </div>
+                            <div class="col-auto">
+                                <select name="isApproved" class="form-select" onchange="this.form.submit()">
+                                    <option value="">Tümü</option>
+                                    <!option value="true" @(ViewBag.IsApproved == true ? "selected" : "")>Onaylananlar</!option>
+                                    <!option value="false" @(ViewBag.IsApproved == false ? "selected" : "")>Onay Bekleyenler</!option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-5 mb-xl-8">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">Toplam @Model.Count() Yorum</span>
+                        </h3>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="table-responsive">
+                            <table class="table align-middle gs-0 gy-4">
+                                <thead>
+                                    <tr class="fw-bold text-muted bg-light">
+                                        <th class="ps-4 rounded-start">Ad Soyad</th>
+                                        <th>Ürün</th>
+                                        <th>Yorum & Puan</th>
+                                        <th>Tarih</th>
+                                        <th>Cevap</th>
+                                        <th>Durum</th>
+                                        <th class="rounded-end">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <span class="text-gray-900 fw-bold fs-6">@item.Name</span>
+                                                    <span class="text-muted small">@item.Email</span>
+                                                </div>
+                                            </td>
+                                            <td>@(item.Product?.Name ?? "-")</td>
+                                            <td style="max-width: 300px;">
+                                                <div class="mb-1">
+                                                    @for (int i = 0; i < item.Rating; i++)
+                                                    {
+                                                        <i class="fa fa-star text-warning"></i>
+                                                    }
+                                                    @for (int i = item.Rating; i < 5; i++)
+                                                    {
+                                                        <i class="fa fa-star-o text-muted"></i>
+                                                    }
+                                                </div>
+                                                <span title="@item.Comment">
+                                                    @if (item.Comment != null && item.Comment.Length > 100)
+                                                    {
+                                                        @item.Comment.Substring(0, 100)<text>...</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        @item.Comment
+                                                    }
+                                                </span>
+                                            </td>
+                                            <td>@item.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(item.AdminReply))
+                                                {
+                                                    <span class="badge badge-light-info" title="@item.AdminReply">Cevaplandı</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light">Yok</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (item.IsApproved)
+                                                {
+                                                    <span class="badge badge-light-success">Onaylı</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light-warning">Onay Bekliyor</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-end flex-shrink-0">
+                                                    <form asp-action="ToggleApproval" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        @if (item.IsApproved)
+                                                        {
+                                                            <button type="submit" class="btn btn-icon btn-bg-light btn-active-color-warning btn-sm me-1" title="Onayı Kaldır">
+                                                                <i class="bi bi-x-circle fs-3"></i>
+                                                            </button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button type="submit" class="btn btn-icon btn-bg-light btn-active-color-success btn-sm me-1" title="Onayla">
+                                                                <i class="bi bi-check-circle fs-3"></i>
+                                                            </button>
+                                                        }
+                                                    </form>
+                                                    
+                                                    <a href="javascript:void(0);" onclick="openReplyModal(@item.Id, '@(item.AdminReply?.Replace("'", "\\'") ?? "")')" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" title="Cevapla">
+                                                        <i class="bi bi-reply-fill fs-3"></i>
+                                                    </a>
+
+                                                    <a href="javascript:void(0);" onclick="deleteComment(@item.Id)" class="btn btn-icon btn-bg-light btn-active-color-danger btn-sm" title="Sil">
+                                                        <i class="bi bi-trash-fill fs-3"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mt-5">
+                                <div class="text-muted">
+                                    Sayfa @ViewBag.CurrentPage / @ViewBag.TotalPages
+                                </div>
+                                <ul class="pagination">
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-isApproved="@ViewBag.IsApproved">Önceki</a>
+                                        </li>
+                                    }
+                                    
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-isApproved="@ViewBag.IsApproved">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-isApproved="@ViewBag.IsApproved">Sonraki</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal -->
+<div class="modal fade" id="replyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Reply" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Yoruma Cevap Ver</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="replyCommentId" name="id" />
+                    <div class="mb-3">
+                        <label class="form-label">Cevabınız</label>
+                        <textarea class="form-control" name="replyMessage" id="replyMessage" rows="5" placeholder="Cevabınızı buraya yazın..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteComment(id) {
+            if (confirm('Bu yorumu silmek istediğinize emin misiniz?')) {
+                window.location.href = '/Admin/ProductComment/Delete/' + id;
+            }
+        }
+
+        function openReplyModal(id, currentReply) {
+            document.getElementById('replyCommentId').value = id;
+            document.getElementById('replyMessage').value = currentReply || '';
+            
+            // Bootstrap 5 Modal
+            var myModal = new bootstrap.Modal(document.getElementById('replyModal'));
+            myModal.show();
+        }
+    </script>
+}

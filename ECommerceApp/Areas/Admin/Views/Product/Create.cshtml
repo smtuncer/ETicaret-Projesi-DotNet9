@@ -1,0 +1,195 @@
+@model ECommerceApp.Models.Product
+
+@{
+    ViewData["Title"] = "Yeni Ürün";
+    Layout = "~/Areas/Admin/Views/_AdminLayout.cshtml";
+}
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Yeni Ürün</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Product" asp-action="Index" class="text-muted text-hover-primary">Ürünler</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Yeni Ürün</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div class="card mb-5 mb-xl-10">
+                        <div class="card-header border-0 cursor-pointer">
+                            <div class="card-title m-0">
+                                <h3 class="fw-bold m-0">Ürün Bilgileri</h3>
+                            </div>
+                        </div>
+                        <div class="card-body border-top p-9">
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">Ürün Adı</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" asp-for="Name" class="form-control form-control-lg form-control-solid" placeholder="Ürün adı" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Stok Kodu (SKU)</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" asp-for="SKU" class="form-control form-control-lg form-control-solid" placeholder="SKU" />
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Barkod</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" asp-for="Barcode" class="form-control form-control-lg form-control-solid" placeholder="Barkod" />
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Kategori</label>
+                                <div class="col-lg-8 fv-row">
+                                    <select asp-for="CategoryId" class="form-select form-select-solid" asp-items="ViewBag.CategoryId">
+                                        <option value="">-- Kategori Seçiniz --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Marka</label>
+                                <div class="col-lg-8 fv-row">
+                                    <select asp-for="BrandId" class="form-select form-select-solid" asp-items="ViewBag.BrandId">
+                                        <option value="">-- Marka Seçiniz --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">Fiyat</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="number" step="0.01" asp-for="Price" class="form-control form-control-lg form-control-solid" placeholder="0.00" />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Bayi Fiyatı</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="number" step="0.01" asp-for="DealerPrice" class="form-control form-control-lg form-control-solid" placeholder="0.00" />
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Para Birimi</label>
+                                <div class="col-lg-8 fv-row">
+                                    <select asp-for="Currency" class="form-select form-select-solid">
+                                        <option value="TL">TL</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">KDV Oranı</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="number" asp-for="VAT" class="form-control form-control-lg form-control-solid" placeholder="20" />
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Stok Miktarı</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="number" asp-for="Stock" class="form-control form-control-lg form-control-solid" placeholder="0" />
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Açıklama</label>
+                                <div class="col-lg-8 fv-row">
+                                    <textarea asp-for="Description" class="form-control form-control-lg form-control-solid" rows="4"></textarea>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Aktif mi?</label>
+                                <div class="col-lg-8 fv-row">
+                                    <div class="form-check form-check-solid form-switch fv-row">
+                                        <input class="form-check-input w-45px h-30px" type="checkbox" asp-for="IsActive" />
+                                        <label class="form-check-label" asp-for="IsActive"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label fw-semibold fs-6">Öne Çıkar</label>
+                                <div class="col-lg-8 fv-row">
+                                    <div class="form-check form-check-solid form-switch fv-row">
+                                        <input class="form-check-input w-45px h-30px" type="checkbox" asp-for="IsFeatured" />
+                                        <label class="form-check-label" asp-for="IsFeatured"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attributes Section -->
+                    <div class="card mb-5 mb-xl-10">
+                        <div class="card-header border-0 cursor-pointer">
+                            <div class="card-title m-0">
+                                <h3 class="fw-bold m-0">Ürün Özellikleri</h3>
+                            </div>
+                        </div>
+                        <div class="card-body border-top p-9">
+                            <div id="attributes-container">
+                                <div class="row mb-4 attribute-row">
+                                    <div class="col-md-5">
+                                        <input type="text" name="AttributeNames" class="form-control form-control-solid" placeholder="Özellik Adı (Örn: Renk)" />
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="text" name="AttributeValues" class="form-control form-control-solid" placeholder="Değer (Örn: Kırmızı)" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger btn-sm remove-attribute">Sil</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-light-primary btn-sm" id="add-attribute">
+                                <i class="ki-duotone ki-plus fs-2"></i>Özellik Ekle
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end py-6 px-9">
+                        <a asp-action="Index" class="btn btn-light me-3">İptal</a>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#add-attribute').click(function() {
+                var html = `
+                    <div class="row mb-4 attribute-row">
+                        <div class="col-md-5">
+                            <input type="text" name="AttributeNames" class="form-control form-control-solid" placeholder="Özellik Adı" />
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" name="AttributeValues" class="form-control form-control-solid" placeholder="Değer" />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm remove-attribute">Sil</button>
+                        </div>
+                    </div>
+                `;
+                $('#attributes-container').append(html);
+            });
+
+            $(document).on('click', '.remove-attribute', function() {
+                $(this).closest('.attribute-row').remove();
+            });
+        });
+    </script>
+}

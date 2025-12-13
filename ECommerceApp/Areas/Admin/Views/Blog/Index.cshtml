@@ -1,0 +1,415 @@
+@model IEnumerable<Blog>
+
+<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Blog Listesi</h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a asp-controller="Dashboard" asp-action="Index" class="text-muted text-hover-primary">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">Blog Yönetimi</li>
+                    </ul>
+                </div>
+                <div class="card-toolbar">
+                    <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addBlogModal">
+                        <i class="ki-duotone ki-plus fs-2"></i>Yeni Blog Ekle
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <!-- Search and Filter -->
+                <div class="card mb-5">
+                    <div class="card-body">
+                        <form method="get" asp-action="Index" class="row g-3">
+                            <div class="col-md-4">
+                                <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Başlık veya özette ara...">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="categoryId" class="form-select">
+                                    <option value="">Tüm Kategoriler</option>
+                                    @if (ViewBag.Categories != null)
+                                    {
+                                        @foreach (var category in ViewBag.Categories)
+                                        {
+                                            <option value="@category.Id" selected="@(ViewBag.CategoryId == category.Id)">@category.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select name="isPublished" class="form-select">
+                                    <option value="">Tüm Durumlar</option>
+                                    <option value="true" selected="@(ViewBag.IsPublished == true)">Yayında</option>
+                                    <option value="false" selected="@(ViewBag.IsPublished == false)">Taslak</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="ki-duotone ki-magnifier fs-2"></i>Ara
+                                </button>
+                                <a asp-action="Index" class="btn btn-light">Temizle</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Blogs Table -->
+                <div class="card mb-5 mb-xl-8">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">Toplam @ViewBag.TotalBlogs Blog</span>
+                        </h3>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="table-responsive">
+                            <table class="table align-middle gs-0 gy-4">
+                                <thead>
+                                    <tr class="fw-bold text-muted bg-light">
+                                        <th class="ps-4 rounded-start">Başlık</th>
+                                        <th>Kategori</th>
+                                        <th>Yazar</th>
+                                        <th>Durum</th>
+                                        <th>Görüntülenme</th>
+                                        <th>Tarih</th>
+                                        <th class="rounded-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var blog in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(blog.FeaturedImage))
+                                                    {
+                                                        <div class="symbol symbol-50px me-5">
+                                                            <img src="@blog.FeaturedImage" alt="@blog.Title" />
+                                                        </div>
+                                                    }
+                                                    <div class="d-flex justify-content-start flex-column">
+                                                        <span class="text-gray-900 fw-bold mb-1 fs-6">@blog.Title</span>
+                                                        @if (blog.IsFeatured)
+                                                        {
+                                                            <span class="badge badge-light-warning badge-sm">Öne Çıkan</span>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@(blog.Category?.Name ?? "-")</td>
+                                            <td>@(blog.Author != null ? $"{blog.Author.Name} {blog.Author.Surname}" : "-")</td>
+                                            <td>
+                                                @if (blog.IsPublished)
+                                                {
+                                                    <span class="badge badge-light-success">Yayında</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light-warning">Taslak</span>
+                                                }
+                                            </td>
+                                            <td>@blog.ViewCount</td>
+                                            <td>@blog.CreatedDate.ToString("dd.MM.yyyy")</td>
+                                            <td>
+                                                <a href="#" class="btn btn-success btn-sm px-4 me-2" data-bs-toggle="modal" data-bs-target="#editModal-@blog.Id">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <a href="#" class="btn btn-danger btn-sm px-4 me-2" data-bs-toggle="modal" data-bs-target="#deleteModal-@blog.Id">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </a>
+                                                @if (blog.IsPublished)
+                                                {
+                                                    <a asp-action="TogglePublish" asp-route-id="@blog.Id" class="btn btn-warning btn-sm px-4" onclick="return confirm('Bu blogu yayından kaldırmak istediğinize emin misiniz?')">
+                                                        <i class="bi bi-eye-slash-fill"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-action="TogglePublish" asp-route-id="@blog.Id" class="btn btn-info btn-sm px-4" onclick="return confirm('Bu blogu yayınlamak istediğinize emin misiniz?')">
+                                                        <i class="bi bi-eye-fill"></i>
+                                                    </a>
+                                                }
+
+                                                <!-- Delete Modal -->
+                                                <div class="modal fade" id="deleteModal-@blog.Id" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered mw-650px">
+                                                        <div class="modal-content rounded">
+                                                            <div class="modal-header pb-0 border-0 justify-content-end">
+                                                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                                <div class="mb-13 text-center">
+                                                                    <h1 class="mb-3">Blog Sil</h1>
+                                                                    <div class="text-muted fw-semibold fs-5">Bu işlem geri alınamaz!</div>
+                                                                </div>
+                                                                <div class="mb-13">
+                                                                    <div class="text-center">
+                                                                        <h4 class="fw-bold">@blog.Title</h4>
+                                                                        <p><strong>Kategori:</strong> @(blog.Category?.Name ?? "-")</p>
+                                                                        <p><strong>Görüntülenme:</strong> @blog.ViewCount</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="text-center">
+                                                                    <button type="button" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                                                                    <a asp-action="Delete" asp-route-id="@blog.Id" class="btn btn-danger">
+                                                                        <span class="indicator-label">Sil</span>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Edit Modal -->
+                                                <div class="modal fade" id="editModal-@blog.Id" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered mw-900px">
+                                                        <div class="modal-content rounded">
+                                                            <div class="modal-header pb-0 border-0 justify-content-end">
+                                                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                                                                    <i class="ki-duotone ki-cross fs-1"></i>
+                                                                </div>
+                                                            </div>
+                                                            <form asp-action="Edit" method="Post" enctype="multipart/form-data">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="Id" value="@blog.Id" />
+                                                                <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                                    <div class="text-center mb-13">
+                                                                        <h1 class="mb-3">Blog Düzenle</h1>
+                                                                        <div class="text-muted fw-semibold fs-5">Blog bilgilerini güncelleyin</div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Başlık</label>
+                                                                        <div class="col-lg-9">
+                                                                            <input type="text" name="Title" class="form-control form-control-lg form-control-solid" value="@blog.Title" required />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Özet</label>
+                                                                        <div class="col-lg-9">
+                                                                            <textarea name="Summary" class="form-control form-control-lg form-control-solid" rows="3">@blog.Summary</textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">İçerik</label>
+                                                                        <div class="col-lg-9">
+                                                                            <textarea name="Content" class="form-control form-control-lg form-control-solid rich-editor" rows="8" required>@blog.Content</textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Kategori</label>
+                                                                        <div class="col-lg-9">
+                                                                            <select name="CategoryId" class="form-select form-select-lg form-select-solid">
+                                                                                <option value="">Kategori Seçin</option>
+                                                                                @if (ViewBag.Categories != null)
+                                                                                {
+                                                                                    @foreach (var category in ViewBag.Categories)
+                                                                                    {
+                                                                                        <option value="@category.Id" selected="@(blog.CategoryId == category.Id)">@category.Name</option>
+                                                                                    }
+                                                                                }
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Öne Çıkan Görsel</label>
+                                                                        <div class="col-lg-9">
+                                                                            <input type="file" name="FeaturedImage" class="form-control form-control-lg form-control-solid" accept="image/*" />
+                                                                            @if (!string.IsNullOrEmpty(blog.FeaturedImage))
+                                                                            {
+                                                                                <div class="mt-3">
+                                                                                    <img src="@blog.FeaturedImage" alt="Current" style="max-width: 200px;" />
+                                                                                </div>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mb-6">
+                                                                        <label class="col-lg-3 col-form-label fw-semibold fs-6"></label>
+                                                                        <div class="col-lg-9">
+                                                                            <div class="form-check form-check-custom form-check-solid">
+                                                                                <input class="form-check-input" type="checkbox" name="IsPublished" value="true" @(blog.IsPublished ? "checked" : "") />
+                                                                                <label class="form-check-label">Yayınla</label>
+                                                                            </div>
+                                                                            <div class="form-check form-check-custom form-check-solid mt-3">
+                                                                                <input class="form-check-input" type="checkbox" name="IsFeatured" value="true" @(blog.IsFeatured ? "checked" : "") />
+                                                                                <label class="form-check-label">Öne Çıkar</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="text-center">
+                                                                        <button type="button" data-bs-dismiss="modal" class="btn btn-light me-3">İptal</button>
+                                                                        <button type="submit" class="btn btn-primary">
+                                                                            <span class="indicator-label">Değişiklikleri Kaydet</span>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mt-5">
+                                <div class="text-muted">
+                                    Sayfa @ViewBag.CurrentPage / @ViewBag.TotalPages
+                                </div>
+                                <ul class="pagination">
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-search="@ViewBag.Search" asp-route-categoryId="@ViewBag.CategoryId" asp-route-isPublished="@ViewBag.IsPublished">Önceki</a>
+                                        </li>
+                                    }
+
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@ViewBag.Search" asp-route-categoryId="@ViewBag.CategoryId" asp-route-isPublished="@ViewBag.IsPublished">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-search="@ViewBag.Search" asp-route-categoryId="@ViewBag.CategoryId" asp-route-isPublished="@ViewBag.IsPublished">Sonraki</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Add Blog Modal -->
+                <div class="modal fade" id="addBlogModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered mw-900px">
+                        <div class="modal-content rounded">
+                            <form asp-action="Create" method="Post" enctype="multipart/form-data">
+                                @Html.AntiForgeryToken()
+                                <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                    <div class="text-center mb-13">
+                                        <h1 class="mb-3">Yeni Blog Ekle</h1>
+                                        <div class="text-muted fw-semibold fs-5">Blog bilgilerini girin</div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-3 col-form-label required fw-semibold fs-6">Başlık</label>
+                                        <div class="col-lg-9">
+                                            <input type="text" name="Title" class="form-control form-control-lg form-control-solid" placeholder="Blog başlığı" required />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Özet</label>
+                                        <div class="col-lg-9">
+                                            <textarea name="Summary" class="form-control form-control-lg form-control-solid" rows="3" placeholder="Kısa özet"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-3 col-form-label required fw-semibold fs-6">İçerik</label>
+                                        <div class="col-lg-9">
+                                            <textarea name="Content" class="form-control form-control-lg form-control-solid rich-editor" rows="8" placeholder="Blog içeriği" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Kategori</label>
+                                        <div class="col-lg-9">
+                                            <select name="CategoryId" class="form-select form-select-lg form-select-solid">
+                                                <option value="">Kategori Seçin</option>
+                                                @if (ViewBag.Categories != null)
+                                                {
+                                                    @foreach (var category in ViewBag.Categories)
+                                                    {
+                                                        <option value="@category.Id">@category.Name</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Öne Çıkan Görsel</label>
+                                        <div class="col-lg-9">
+                                            <input type="file" name="FeaturedImage" class="form-control form-control-lg form-control-solid" accept="image/*" />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-6">
+                                        <label class="col-lg-3 col-form-label fw-semibold fs-6"></label>
+                                        <div class="col-lg-9">
+                                            <div class="form-check form-check-custom form-check-solid">
+                                                <input class="form-check-input" type="checkbox" name="IsPublished" value="true" />
+                                                <label class="form-check-label">Yayınla</label>
+                                            </div>
+                                            <div class="form-check form-check-custom form-check-solid mt-3">
+                                                <input class="form-check-input" type="checkbox" name="IsFeatured" value="true" />
+                                                <label class="form-check-label">Öne Çıkar</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="reset" data-bs-dismiss="modal" class="btn btn-light me-3">Geri</button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <span class="indicator-label">Ekle</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            function initEditors(context) {
+                $(context).find('.rich-editor').each(function () {
+                    if (!$(this).data('summernote')) {
+                        $(this).summernote({
+                            height: 300,
+                            toolbar: [
+                                ['style', ['style']],
+                                ['font', ['bold', 'italic', 'underline', 'clear']],
+                                ['fontname', ['fontname']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['insert', ['link', 'picture', 'video']],
+                                ['view', ['fullscreen', 'codeview']]
+                            ]
+                        });
+                    }
+                });
+            }
+
+            // Initial for already-open modals (if any)
+            initEditors(document);
+
+            // When create/edit modals are opened, initialize editors inside
+            $('#addBlogModal').on('shown.bs.modal', function () {
+                initEditors(this);
+            });
+
+            $('[id^="editModal-"]').on('shown.bs.modal', function () {
+                initEditors(this);
+            });
+        });
+    </script>
+}
