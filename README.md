@@ -50,17 +50,17 @@ Sistem, her gece **04:00**'da çalışan bir "Job" motoruna sahiptir.
 *   Fiyat karşılaştırma platformları olan Akakçe ve Cimri için XML tabanlı ürün feed altyapısı geliştirilmiştir.
 *   Bu yapı sayesinde ürünler, platformların istediği formatta otomatik olarak dış sistemlere aktarılır.
 
-📌 Feed URL’leri
-/feed/akakce.xml
-/feed/cimri.xml
-* Dinamik XML Üretimi: Feed’ler anlık olarak veritabanından üretilir, statik dosya kullanılmaz.
-* Platforma Özel Şema: Akakçe ve Cimri’nin XML standartlarına uygun alan eşleştirmeleri yapılmıştır.
-* Stok & Fiyat Kontrolü:
-* Stokta olmayan ürünler otomatik olarak feed dışında bırakılır.
-* Güncel fiyat, indirimli fiyat ve KDV dahil tutarlar doğru şekilde yansıtılır.
-* SEO & Kategori Uyumlu: Ürün URL’leri SEO uyumlu slug yapısı ile feed’e eklenir.
-* Performans Odaklı: Büyük ürün sayılarında dahi hızlı üretim için optimize edilmiştir.
-* Canlı Güncelleme: Ürün fiyatı veya stok değiştiğinde feed otomatik olarak güncel kalır.
+   📌 Feed URL’leri
+      /feed/akakce.xml
+      /feed/cimri.xml
+   * Dinamik XML Üretimi: Feed’ler anlık olarak veritabanından üretilir, statik dosya kullanılmaz.
+   * Platforma Özel Şema: Akakçe ve Cimri’nin XML standartlarına uygun alan eşleştirmeleri yapılmıştır.
+   * Stok & Fiyat Kontrolü:
+   * Stokta olmayan ürünler otomatik olarak feed dışında bırakılır.
+   * Güncel fiyat, indirimli fiyat ve KDV dahil tutarlar doğru şekilde yansıtılır.
+   * SEO & Kategori Uyumlu: Ürün URL’leri SEO uyumlu slug yapısı ile feed’e eklenir.
+   * Performans Odaklı: Büyük ürün sayılarında dahi hızlı üretim için optimize edilmiştir.
+   * Canlı Güncelleme: Ürün fiyatı veya stok değiştiğinde feed otomatik olarak güncel kalır.
 
 ### 6. 🌐 SEO ve Sitemap Yönetimi
 Platform, arama motorları için optimize edilmiş, **tam dinamik** bir `sitemap.xml` altyapısına sahiptir.
@@ -73,18 +73,27 @@ Platform, arama motorları için optimize edilmiş, **tam dinamik** bir `sitemap
 
 ```
 ECommerceApp/
+├── Areas/                  # Modüler Uygulama Katmanı
+│   ├── Admin/              # Yönetim Paneli (Controllers & Views)
+│   └── User/               # Müşteri Önyüzü (Martfury Teması)
 ├── Services/               # İş Mantığı Katmanı (Business Logic)
-│   ├── XmlImportService.cs # XML İşleme, Batching ve Transaction Mantığı
-│   ├── NetGsmSmsService.cs # SOAP/XML SMS Entegrasyonu
-│   ├── EmailService.cs     # Dinamik SMTP Servisi
+│   ├── XmlImportService.cs # Gelişmiş XML Entegrasyonu (Batch & Transaction)
+│   ├── NetGsmSmsService.cs # SOAP/XML SMS Servisi
+│   ├── NavlungoService.cs  # Kargo Fiyatlama ve Takip Entegrasyonu
+│   ├── IyzicoService.cs    # Ödeme Sistemi (Adapter Pattern)
 │   └── ...
-├── Models/                 # EF Core Varlıkları (Entities)
-├── Controllers/            # MVC Controller'lar
-├── Views/                  # Razor Arayüzleri (Martfury Teması)
-└── Program.cs              # DI Container & Hangfire Konfigürasyonu
-```
+├── Models/                 # EF Core Varlıkları ve ViewModels
+├── ViewComponents/         # Tekrar Kullanılabilir UI Bileşenleri
+├── Helper/                 # Yardımcı Araçlar (SeoUrl, Cryptography vb.)
+├── Mappings/               # AutoMapper Dönüşüm Profilleri
+├── wwwroot/                # Statik Dosyalar (CSS, JS, Resimler)
+├── Program.cs              # DI Container & Hangfire Konfigürasyonu
+└── appsettings.json        # Veritabanı ve Servis Ayarları
 
----
+```
+Bu yapıyı tercih etmemin nedeni; tek kod tabanı üzerinden hızlı geliştirme, kolay bakım ve düşük maliyet sağlamasıdır.  
+Monolitik mimari sayesinde iş mantığı, UI ve entegrasyonlar net şekilde ayrılmış; buna rağmen deploy, debug ve yönetim süreçleri sade tutulmuştur.  
+Ayrıca bu yapı, ihtiyaç oluştuğunda belirli modüllerin ayrıştırılarak bağımsız servislere dönüştürülebilmesine uygun bir temel sunmaktadır.  
 
 ## 🛠️ Kurulum
 
