@@ -18,7 +18,7 @@ https://heuristic-satoshi.104-247-162-242.plesk.page/
 https://heuristic-satoshi.104-247-162-242.plesk.page/admin/dashboard
 
 👤 Admin Giriş Bilgileri
-Kullanıcı Adı: admin
+Kullanıcı Adı: admin@gmail.com
 Şifre: 123456
 
 ## 🚀 Temel Teknik Özellikler
