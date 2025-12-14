@@ -33,7 +33,7 @@ Sistem, her gece **04:00**'da çalışan bir "Job" motoruna sahiptir.
 *   **Stok Koruması:** Stok adedi kritik seviyenin (`<= 2`) altındaki ürünler otomatik olarak satışa kapatılır.
 
 ### 2. 💳 Ödeme Altyapısı
-*   **Hibrit Ödeme Ağ Geçidi:** Admin panelinden tek tuşla **PayTR** veya **Iyzico** altyapısına geçiş yapılabilir.
+*   **Hibrit Ödeme Ağ Geçidi:** **PayTR** veya **Iyzico** altyapısına geçiş yapılabilir.
 *   **Güvenlik:** PayTR için iFrame API, Iyzico için güvenli form yapısı entegre edilmiştir.
 *   **Ödeme Bildirimi:** Eft/Havale ile ödemelerde kullanıcı satıcının banka hesap bilgilerini görüntüleyip siparişi için ödeme bildiriminde bulunabilir.
 
