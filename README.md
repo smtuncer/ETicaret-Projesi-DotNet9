@@ -106,8 +106,6 @@ ECommerceApp/
     ```bash
     dotnet run
     ```
-5.  **Hangfire Paneline Erişim**
-    Arkaplan işlemlerini izlemek için `/hangfire` adresine gidin (Admin girişi gerektirir).
 
 ---
 
