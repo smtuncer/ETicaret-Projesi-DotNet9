@@ -153,10 +153,10 @@ Proje, tam fonksiyonel bir e-ticaret deneyimi sunmak için çeşitli 3. parti se
 *   Kargo & Lojistik:  vlungo: Kargo fiyat hesaplama ve gönderi takibi entegrasyonu.
 *   İletişim & SMS:  tGSM: Sipariş ve durum bildirimleri için SMS servisi.
 *   XML Entegrasyonları: Akakçe ve Cimri gibi fiyat karşılaştırma siteleri için otomatik XML feed oluşturma.
-*   Ürün Tedariği: Tedarikçilerden otomatik ürün ve stok güncellemek için gelişmiş XML Import servisi.
+*   Ürün Tedariği: Tedarikçilerden otomatik ürün ve stok güncellemek için XML Import servisi.
 *   MVC (Model-View-Controller): Projenin temel mimari yapısı.
 *   Dependency Injection (DI): Servislerin (Email, SMS, Kargo vb.) gevşek bağımlılıkla yönetilmesi.
-*   Dinamik Sitemap.xml ve Robots.txt yönetimi.
+*   Dinamik Sitemap.xml yönetimi.
 *   Akıllı URL yapısı (Slugify) - Örn: /kategori/telefon-kiliflari-123.
 
 ### Kullanılan Önemli NuGet Paketleri
@@ -168,6 +168,6 @@ Proje, tam fonksiyonel bir e-ticaret deneyimi sunmak için çeşitli 3. parti se
 *   X.PagedList.Mvc.Core - Sayfalama (Pagination) altyapısı.
 
 ## 👨‍💻 Yazar
-**Selçuk Mehmet TUNÇER**
+**Selçuk Mehmet TUNÇER**    
 *.NET Developer*
 
