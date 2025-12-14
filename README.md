@@ -150,8 +150,8 @@ Proje, tam fonksiyonel bir e-ticaret deneyimi sunmak için çeşitli 3. parti se
 ### Ödeme Sistemleri:
 *   Iyzico: Kredi kartı ile güvenli ödeme altyapısı.
 *   PayTR: Alternatif sanal POS entegrasyonu.
-*   Kargo & Lojistik:  vlungo: Kargo fiyat hesaplama ve gönderi takibi entegrasyonu.
-*   İletişim & SMS:  tGSM: Sipariş ve durum bildirimleri için SMS servisi.
+*   Kargo & Lojistik:  Navlungo: Kargo fiyat hesaplama ve gönderi takibi entegrasyonu.
+*   İletişim & SMS:  NetGSM: Sipariş ve durum bildirimleri için SMS servisi.
 *   XML Entegrasyonları: Akakçe ve Cimri gibi fiyat karşılaştırma siteleri için otomatik XML feed oluşturma.
 *   Ürün Tedariği: Tedarikçilerden otomatik ürün ve stok güncellemek için XML Import servisi.
 *   MVC (Model-View-Controller): Projenin temel mimari yapısı.
