@@ -9,16 +9,17 @@ Bu proje, güncel **ASP.NET Core 9.0** teknolojisi ile geliştirilmiş, uçtan u
 
 ---
 
-🔐 Admin Panel & Erişim Bilgileri
+🔐 Admin Panel & Erişim Bilgileri  
 Not: Bu bilgiler demo / inceleme amaçlıdır. Canlı projelerde mutlaka değiştirilmelidir.
-🌐 Site URL
+
+🌐 Site URL  
 https://heuristic-satoshi.104-247-162-242.plesk.page/
 
-🧩 Admin Panel URL
+🧩 Admin Panel URL  
 https://heuristic-satoshi.104-247-162-242.plesk.page/admin/dashboard
 
-👤 Admin Giriş Bilgileri
-Kullanıcı Adı: admin@gmail.com
+👤 Admin Giriş Bilgileri  
+Kullanıcı Adı: admin@gmail.com  
 Şifre: 123456
 
 ## 🚀 Temel Teknik Özellikler
