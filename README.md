@@ -46,7 +46,7 @@ Sistem, her gece **04:00**'da çalışan bir "Job" motoruna sahiptir.
 *   **Dinamik SMTP Motoru:** Mail sunucu ayarları (Host, Port, Credentials) `appsettings.json` yerine veritabanında tutulur; böylece kod değiştirmeden sunucu değişikliği yapılabilir.
 *   **Şablon Motoru:** Hoşgeldin, Sipariş Onayı ve Şifre Sıfırlama gibi mailler HTML şablonları üzerinden dinamik olarak oluşturulur.
 
-### 🧾 Akakçe & Cimri Ürün Feed Sistemi
+### 5. 🧾 Akakçe & Cimri Ürün Feed Sistemi
 *   Fiyat karşılaştırma platformları olan Akakçe ve Cimri için XML tabanlı ürün feed altyapısı geliştirilmiştir.
 *   Bu yapı sayesinde ürünler, platformların istediği formatta otomatik olarak dış sistemlere aktarılır.
 
@@ -62,7 +62,7 @@ Sistem, her gece **04:00**'da çalışan bir "Job" motoruna sahiptir.
 * Performans Odaklı: Büyük ürün sayılarında dahi hızlı üretim için optimize edilmiştir.
 * Canlı Güncelleme: Ürün fiyatı veya stok değiştiğinde feed otomatik olarak güncel kalır.
 
-### 5. 🌐 SEO ve Sitemap Yönetimi
+### 6. 🌐 SEO ve Sitemap Yönetimi
 Platform, arama motorları için optimize edilmiş, **tam dinamik** bir `sitemap.xml` altyapısına sahiptir.
 *   **Otomatik Güncelleme:** `/sitemap.xml` adresi her çağrıldığında veritabanındaki en güncel verilerle (Ürünler, Kategoriler, Blog Yazıları) dinamik olarak oluşturulur. Statik dosya yönetimine gerek yoktur.
 *   **Performans & Caching:** Sunucu yükünü minimize etmek için oluşturulan harita **1 saat (3600 sn)** boyunca sunucu belleğinde önbelleklenir.
